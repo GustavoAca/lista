@@ -1,0 +1,21 @@
+spring:
+  application:
+    name: lista
+  config:
+    activate:
+      on-profile: dev
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/glaiss
+    username: att_lista_app
+    password: lista_SaintBier
+    driver-class-name: org.postgresql.Driver
+  flyway:
+    user: att_lista
+    password: lista_SaintBier
+    locations: classpath:db/migration
+    table: FLYWAY_SCHEMA_HISTORY
+    schemas: att_lista
+
+server:
+  port: 8080
