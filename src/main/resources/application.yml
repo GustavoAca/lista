@@ -1,21 +1,36 @@
 spring:
   application:
-    name: lista
+    name: LISTA
   config:
     activate:
       on-profile: dev
 
   datasource:
     url: jdbc:postgresql://localhost:5432/glaiss
-    username: att_lista_app
-    password: lista_SaintBier
+    username: att_lista
+    password: lista_ddl_SaintBier
     driver-class-name: org.postgresql.Driver
   flyway:
     user: att_lista
-    password: lista_SaintBier
+    password: lista_ddl_SaintBier
     locations: classpath:db/migration
     table: FLYWAY_SCHEMA_HISTORY
     schemas: att_lista
 
 server:
-  port: 8080
+  port: 8193
+  servlet:
+    context-path: /lista
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/discovery/eureka
+    fetch-registry: true
+    register-with-eureka: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
