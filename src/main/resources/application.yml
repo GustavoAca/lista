@@ -18,7 +18,7 @@ spring:
     schemas: att_lista
 
 server:
-  port: 8193
+  port: ${PORT:8193}
   servlet:
     context-path: /lista
 
