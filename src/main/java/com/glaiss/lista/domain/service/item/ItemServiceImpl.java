@@ -27,7 +27,7 @@ public class ItemServiceImpl extends BaseServiceImpl<Item, UUID, ItemRepository>
 
     @Override
     public ItemDto buscarPorIdDto(UUID id) {
-        return itemMapper.toDto(super.buscarPorId(id)
+        return itemMapper.toDto(buscarPorId(id)
                 .orElseThrow(() -> new RegistroNaoEncontradoException(id, Item.class.getName())));
     }
 
@@ -37,5 +37,19 @@ public class ItemServiceImpl extends BaseServiceImpl<Item, UUID, ItemRepository>
         List<ItemDto> itens = itensPaginado.getContent().stream()
                 .map(itemMapper::toDto).toList();
         return new PageImpl<>(itens, pageable, itensPaginado.getTotalElements());
+    }
+
+    @Override
+    public ItemDto criar(ItemDto itemDto) {
+        return itemMapper.toDto(salvar(itemMapper.toEntity(itemDto)));
+    }
+
+    @Override
+    public ItemDto adicionarNovoPreco(ItemDto itemDto) {
+        Item item = buscarPorId(itemDto.getId())
+                .orElseThrow(() -> new RegistroNaoEncontradoException(itemDto.getId(), Item.class.getName()));
+        item.getPrecos().addAll(itemMapper.toEntity(itemDto).getPrecos());
+
+        return itemMapper.toDto(salvar(item));
     }
 }

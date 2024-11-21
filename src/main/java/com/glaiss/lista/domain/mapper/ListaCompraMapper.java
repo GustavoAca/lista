@@ -18,8 +18,8 @@ public class ListaCompraMapper {
                 .build();
     }
 
-    public ListaCompra toDto(ListaCompra entity) {
-        return ListaCompra.builder()
+    public ListaCompraDto toDto(ListaCompra entity) {
+        return ListaCompraDto.builder()
                 .id(entity.getId())
                 .usuarioId(entity.getUsuarioId())
                 .createdBy(entity.getCreatedBy())

@@ -24,10 +24,15 @@ public class ItemLista extends EntityAbstract {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "item_id")
-    private UUID itemId;
+    @ManyToOne
+    @JoinColumn(name = "item_id")
+    private Item item;
 
     private BigDecimal preco;
 
     private Integer quantidade;
+
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "lista_compra_id", nullable = false)
+    private ListaCompra listaCompra;
 }

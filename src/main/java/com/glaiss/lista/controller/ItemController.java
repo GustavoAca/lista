@@ -1,6 +1,5 @@
 package com.glaiss.lista.controller;
 
-import com.glaiss.lista.domain.model.Item;
 import com.glaiss.lista.domain.model.dto.ItemDto;
 import com.glaiss.lista.domain.service.item.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,5 +35,10 @@ public class ItemController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Boolean> deletar(@PathVariable UUID id) {
         return ResponseEntity.ok(itemService.deletar(id));
+    }
+
+    @PostMapping
+    public ResponseEntity<ItemDto> criar(@RequestBody ItemDto itemDto) {
+        return ResponseEntity.ok(itemService.criar(itemDto));
     }
 }
