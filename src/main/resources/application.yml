@@ -1,10 +1,14 @@
 spring:
+  cloud:
+    loadbalancer:
+      enabled: true
+      ribbon:
+        enabled: false
   application:
     name: LISTA
   config:
     activate:
       on-profile: dev
-
   datasource:
     url: jdbc:postgresql://localhost:5432/glaiss
     username: att_lista
@@ -16,7 +20,6 @@ spring:
     locations: classpath:db/migration
     table: FLYWAY_SCHEMA_HISTORY
     schemas: att_lista
-
 server:
   port: ${PORT:8193}
   servlet:
@@ -34,7 +37,12 @@ management:
     web:
       exposure:
         include: "*"
-
+  tracing:
+    enabled: true
+    exporter:
+      zipkin:
+        enabled: true
+        url: http://localhost:9411/api/v2/spans
 security:
   oauth2:
     client:
