@@ -1,16 +1,16 @@
 spring:
-  cloud:
-    loadbalancer:
-      enabled: true
-      ribbon:
-        enabled: false
   application:
     name: LISTA
   config:
     activate:
       on-profile: dev
+  cloud:
+    loadbalancer:
+      enabled: true
+      ribbon:
+        enabled: false
   datasource:
-    url: jdbc:postgresql://localhost:5432/glaiss
+    url: jdbc:postgresql://localhost:5432/glaiss?currentSchema=public&stringtype=unspecified&applicationName=app&options=-c%20TimeZone=UTC
     username: att_lista
     password: lista_ddl_SaintBier
     driver-class-name: org.postgresql.Driver
@@ -20,6 +20,14 @@ spring:
     locations: classpath:db/migration
     table: FLYWAY_SCHEMA_HISTORY
     schemas: att_lista
+  jackson:
+    time-zone: America/Sao_Paulo
+  jpa:
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+  timezone: America/Sao_Paulo
 server:
   port: ${PORT:8193}
   servlet:
