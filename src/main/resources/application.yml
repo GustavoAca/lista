@@ -23,6 +23,7 @@ spring:
   jackson:
     time-zone: America/Sao_Paulo
   jpa:
+    enabled: true
     properties:
       hibernate:
         jdbc:

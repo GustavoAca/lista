@@ -2,13 +2,10 @@ package com.glaiss.lista.domain.model;
 
 import com.glaiss.core.domain.model.EntityAbstract;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
 
@@ -28,12 +25,16 @@ public class Item extends EntityAbstract {
     private String peso;
     private String marca;
 
-    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.MERGE)
+    @ManyToMany
     @JoinTable(
             name = "itens_tem_precos",
             joinColumns = @JoinColumn(name = "item_id"),
             inverseJoinColumns = @JoinColumn(name = "preco_id")
     )
-    private List<Preco> precos = new ArrayList<>();
+    @Builder.Default
+    private List<Preco> precos = new LinkedList<>();
 
+    @OneToMany(mappedBy = "item")
+    @Builder.Default
+    private List<ItemLista> itensLista = new LinkedList<>();
 }

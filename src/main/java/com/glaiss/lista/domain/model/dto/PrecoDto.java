@@ -7,8 +7,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Getter
@@ -16,15 +15,9 @@ import java.util.UUID;
 @AllArgsConstructor
 @NoArgsConstructor
 @SuperBuilder
-public class ItemDto extends EntityAbstractDto {
+public class PrecoDto extends EntityAbstractDto {
 
     private UUID id;
-    private String nome;
-    private String peso;
-    private String marca;
-    private List<PrecoDto> precos = new ArrayList<>();
-
-    public void adicionarLocalDoPreco(UUID localId) {
-        this.precos.forEach(p -> p.setLocalId(localId));
-    }
+    private BigDecimal preco;
+    private UUID localId;
 }
