@@ -21,5 +21,5 @@ public class ItemListaDto extends EntityAbstractDto {
     private UUID id;
     private BigDecimal preco;
     private Integer quantidade;
-    private ListaCompraDto listaCompra;
+    private UUID listaCompra;
 }

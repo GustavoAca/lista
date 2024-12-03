@@ -32,7 +32,5 @@ public class ItemLista extends EntityAbstract {
 
     private Integer quantidade;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "lista_compra_id", nullable = false)
-    private ListaCompra listaCompra;
+    private UUID listaCompra;
 }
