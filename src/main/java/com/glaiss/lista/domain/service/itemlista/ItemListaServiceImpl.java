@@ -1,6 +1,8 @@
 package com.glaiss.lista.domain.service.itemlista;
 
 import com.glaiss.core.domain.service.BaseServiceImpl;
+import com.glaiss.core.exception.GlaissException;
+import com.glaiss.core.exception.RegistroNaoEncontradoException;
 import com.glaiss.lista.domain.mapper.ItemListaMapper;
 import com.glaiss.lista.domain.model.ItemLista;
 import com.glaiss.lista.domain.model.dto.ItemListaDto;
@@ -32,9 +34,42 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
         return new PageImpl<>(itensLista, pageable, itensListaPagina.getTotalElements());
     }
 
-    @Override
-    public ItemListaDto salvar(ItemListaDto itemListaDto) {
+    private ItemListaDto salvar(ItemListaDto itemListaDto) {
         return itemListaMapper.toDto(salvar(itemListaMapper.toEntity(itemListaDto)));
     }
 
+    public Page<ItemListaDto> buscarItensListaPorCompraId(UUID listaCompraId,
+                                                          Pageable pageable) {
+        return buscarItensListaPorListaCompraId(listaCompraId, pageable);
+    }
+
+    @Override
+    public Page<ItemListaDto> listarPaginadoDto(Pageable pageable) {
+        Page<ItemLista> itensPaginado = listarPagina(pageable);
+        List<ItemListaDto> itens = itensPaginado.getContent().stream()
+                .map(itemListaMapper::toDto).toList();
+        return new PageImpl<>(itens, pageable, itensPaginado.getTotalElements());
+    }
+
+    @Override
+    public ItemListaDto buscarPorIdDto(UUID id) {
+        return itemListaMapper.toDto(buscarPorId(id)
+                .orElseThrow(() -> new RegistroNaoEncontradoException(id, "ItemLista")));
+    }
+
+    public Boolean removerItemLista(UUID itemListaId) {
+        return deletar(itemListaId);
+    }
+
+    public Boolean adicionarItens(UUID localId, List<ItemListaDto> itensLista) {
+        try {
+            itensLista.forEach(i -> {
+                i.getItem().adicionarLocalDoPreco(localId);
+                salvar(i);
+            });
+            return Boolean.TRUE;
+        } catch (RuntimeException e) {
+            throw new GlaissException();
+        }
+    }
 }
