@@ -3,6 +3,7 @@ package com.glaiss.lista.controller;
 import com.glaiss.lista.domain.model.dto.ItemDto;
 import com.glaiss.lista.domain.service.item.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -22,11 +23,13 @@ public class ItemController {
         this.itemService = itemService;
     }
 
+    @Cacheable(value = "ItemListaDto", key = "#id")
     @GetMapping("/{id}")
     public ResponseEntity<ItemDto> buscarPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(itemService.buscarPorIdDto(id));
     }
 
+    @Cacheable(value = "ItemListaDto", key = "#pageable.pageNumber")
     @GetMapping("/listar")
     public ResponseEntity<Page<ItemDto>> listar(@PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(itemService.listarPaginadoDto(pageable));
