@@ -3,6 +3,8 @@ package com.glaiss.lista.controller;
 import com.glaiss.lista.domain.model.dto.ItemListaDto;
 import com.glaiss.lista.domain.service.itemlista.ItemListaService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
@@ -23,11 +25,13 @@ public class ItemListaController {
         this.itemListaService = itemListaService;
     }
 
+    @Cacheable(value = "ItemListaDto", key = "#id")
     @GetMapping("/{id}")
     public ResponseEntity<ItemListaDto> buscarPorId(@PathVariable UUID id) {
         return ResponseEntity.ok(itemListaService.buscarPorIdDto(id));
     }
 
+    @Cacheable(value = "ItemListaDto", key = "#pageable.pageNumber")
     @GetMapping("/listar")
     public ResponseEntity<Page<ItemListaDto>> listar(@PageableDefault(size = 20) Pageable pageable) {
         return ResponseEntity.ok(itemListaService.listarPaginadoDto(pageable));
@@ -38,15 +42,16 @@ public class ItemListaController {
         return ResponseEntity.ok(itemListaService.deletar(id));
     }
 
-    @GetMapping("/{id}/itens-lista")
-    public ResponseEntity<Page<ItemListaDto>> listarItens(@PathVariable UUID id,
+    @Cacheable(value = "ItemListaDto", key = "#pageable.pageNumber + '_' + #listaCompraId")
+    @GetMapping("/{listaCompraId}/itens-lista")
+    public ResponseEntity<Page<ItemListaDto>> listarItens(@PathVariable UUID listaCompraId,
                                                           @PageableDefault(size = 20) Pageable pageable) {
-        return ResponseEntity.ok(itemListaService.buscarItensListaPorCompraId(id, pageable));
+        return ResponseEntity.ok(itemListaService.buscarItensListaPorListaCompraId(listaCompraId, pageable));
     }
 
-    @DeleteMapping("/{listaCompraId}/itens-lista/{id}")
-    public ResponseEntity<Boolean> apagarItenLista(@PathVariable UUID listaCompraId,
-                                                   @PathVariable UUID id) {
+    @CacheEvict(value = "ItemListaDto", key = "#id")
+    @DeleteMapping("/lista-de-compra/itens-lista/{id}")
+    public ResponseEntity<Boolean> apagarItenLista(@PathVariable UUID id) {
         return ResponseEntity.ok(itemListaService.removerItemLista(id));
     }
 

@@ -38,11 +38,6 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
         return itemListaMapper.toDto(salvar(itemListaMapper.toEntity(itemListaDto)));
     }
 
-    public Page<ItemListaDto> buscarItensListaPorCompraId(UUID listaCompraId,
-                                                          Pageable pageable) {
-        return buscarItensListaPorListaCompraId(listaCompraId, pageable);
-    }
-
     @Override
     public Page<ItemListaDto> listarPaginadoDto(Pageable pageable) {
         Page<ItemLista> itensPaginado = listarPagina(pageable);

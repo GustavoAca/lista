@@ -18,8 +18,6 @@ public interface ItemListaService extends BaseService<ItemLista, UUID> {
 
     Boolean adicionarItens(UUID localId, List<ItemListaDto> itensLista);
 
-    Page<ItemListaDto> buscarItensListaPorCompraId(UUID id, Pageable pageable);
-
     Page<ItemListaDto> listarPaginadoDto(Pageable pageable);
 
     ItemListaDto buscarPorIdDto(UUID id);
