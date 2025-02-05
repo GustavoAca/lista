@@ -1,37 +1,37 @@
-create table itens
+CREATE TABLE itens
 (
-    id            uuid                     not null constraint pk_itens_id primary key,
-    nome          varchar(250)             not null,
-    peso          varchar(10)              not null,
-    marca         varchar(10)              not null,
-    created_date  timestamp with time zone not null,
-    modified_date timestamp with time zone not null,
-    created_by    varchar(100)             not null,
-    modified_by   varchar(100)             not null
+    ID            UUID                     NOT NULL CONSTRAINT PK_ITENS_ID primary key,
+    NOME          VARCHAR(250)             NOT NULL,
+    PESO          VARCHAR(10)              NOT NULL,
+    MARCA         VARCHAR(10)              NOT NULL,
+    CREATED_DATE  TIMESTAMP WITH TIME ZONE NOT NULL,
+    MODIFIED_DATE TIMESTAMP WITH TIME ZONE NOT NULL,
+    CREATED_BY    VARCHAR(100)             NOT NULL,
+    MODIFIED_BY   VARCHAR(100)             NOT NULL
 );
 
-create table precos
+CREATE TABLE PRECOS
 (
-    id            uuid                     not null constraint pk_precos_id primary key,
-    valor         numeric(10, 2)           not null,
-    local_id      uuid                     not null,
-    item_id       uuid                     not null constraint fk_precos_item_id references itens ( id ),
-    created_date  timestamp with time zone not null,
-    modified_date timestamp with time zone not null,
-    created_by    varchar(100)             not null,
-    modified_by   varchar(100)             not null
+    ID            UUID                     NOT NULL CONSTRAINT PK_PRECOS_ID primary key,
+    VALOR         NUMERIC(10, 2)           NOT NULL,
+    LOCAL_ID      UUID                     NOT NULL,
+    ITEM_ID       UUID                     NOT NULL CONSTRAINT FK_PRECOS_ITEM_ID references itens ( ID ),
+    CREATED_DATE  TIMESTAMP WITH TIME ZONE NOT NULL,
+    MODIFIED_DATE TIMESTAMP WITH TIME ZONE NOT NULL,
+    CREATED_BY    VARCHAR(100)             NOT NULL,
+    MODIFIED_BY   VARCHAR(100)             NOT NULL
 );
 
-create table itens_lista
+CREATE TABLE itens_lista
 (
-    id            uuid                     not null constraint pk_itens_lista_id primary key,
-    item_id       uuid                     not null constraint fk_itens_lista_item_id references itens ( id ),
-    lista_compra_id  uuid                   not null,
-    preco         numeric(10, 2)           not null,
-    quantidade    integer                  not null,
-    created_date  timestamp with time zone not null,
-    modified_date timestamp with time zone not null,
-    created_by    varchar(100)             not null,
-    modified_by   varchar(100)             not null
+    ID                  UUID                        NOT NULL CONSTRAINT PK_ITENS_LISTA_ID primary key,
+    ITEM_ID             UUID                        NOT NULL CONSTRAINT FK_ITENS_LISTA_ITEM_ID references itens ( ID ),
+    LISTA_COMPRA_ID     UUID                        NOT NULL,
+    PRECO               NUMERIC(10, 2)              NOT NULL,
+    QUANTIDADE          INTEGER                     NOT NULL,
+    CREATED_DATE        TIMESTAMP WITH TIME ZONE    NOT NULL,
+    MODIFIED_DATE       TIMESTAMP WITH TIME ZONE    NOT NULL,
+    CREATED_BY          VARCHAR(100)                NOT NULL,
+    MODIFIED_BY         VARCHAR(100)                NOT NULL
 );
 

@@ -10,6 +10,7 @@ import com.glaiss.lista.domain.repository.itemlista.ItemListaRepository;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -55,6 +56,9 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
     }
 
     public void adicionarItens(List<ItemListaDto> itensLista) {
-        itensLista.forEach(this::salvar);
+        BigDecimal valorTotal = BigDecimal.ZERO;
+        itensLista.forEach(i -> {
+            salvar(i);
+        });
     }
 }

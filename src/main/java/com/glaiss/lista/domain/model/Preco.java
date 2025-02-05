@@ -25,6 +25,7 @@ public class Preco extends EntityAbstract {
     private UUID id;
 
     private BigDecimal valor;
+
     @Column(name = "local_id")
     private UUID localId;
 
