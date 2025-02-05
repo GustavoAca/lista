@@ -37,15 +37,17 @@ public class ItemMapper {
         return precoDto.stream().map(precoMapper::toEntity).toList();
     }
 
-    public ItemDto toDto(Item dto){
+    public ItemDto toDto(Item entity) {
         return ItemDto.builder()
-                .id(dto.getId())
-                .nome(dto.getNome())
-                .peso(dto.getPeso())
-                .marca(dto.getMarca())
-                .precos(precoToDto(dto.getPrecos()))
-                .createdBy(dto.getCreatedBy())
-                .createdDate(dto.getCreatedDate())
+                .id(entity.getId())
+                .nome(entity.getNome())
+                .peso(entity.getPeso())
+                .marca(entity.getMarca())
+                .precos(precoToDto(entity.getPrecos()))
+                .createdBy(entity.getCreatedBy())
+                .createdDate(entity.getCreatedDate())
+                .modifiedBy(entity.getModifiedBy())
+                .modifiedDate(entity.getModifiedDate())
                 .build();
     }
 

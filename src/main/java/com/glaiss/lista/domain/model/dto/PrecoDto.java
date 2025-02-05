@@ -18,6 +18,7 @@ import java.util.UUID;
 public class PrecoDto extends EntityAbstractDto {
 
     private UUID id;
-    private BigDecimal preco;
+    private BigDecimal valor;
     private UUID localId;
+    private UUID itemId;
 }

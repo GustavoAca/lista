@@ -1,11 +1,12 @@
 package com.glaiss.lista.controller;
 
+import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.lista.domain.model.dto.PrecoDto;
 import com.glaiss.lista.domain.service.preco.PrecoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.http.ResponseEntity;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -23,13 +24,26 @@ public class PrecoController {
 
     @GetMapping("/{id}")
     @Cacheable(value = "Preco", key = "#id")
-    public ResponseEntity<PrecoDto> buscarPorId(@PathVariable UUID id) {
-        return ResponseEntity.ok(precoService.buscarPorIdDto(id));
+    public PrecoDto buscarPorId(@PathVariable UUID id) {
+        return precoService.buscarPorIdDto(id);
+    }
+
+    @GetMapping("/itens/{itemId}")
+    @Cacheable(value = "Preco", key = "#itemId")
+    public ResponsePage<PrecoDto> buscarPrecoPorItemId(@PathVariable UUID itemId,
+                                                       Pageable pageable) {
+        return precoService.buscarPrecoPorItemId(itemId, pageable);
     }
 
     @CacheEvict(value = "Preco", key = "#id")
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deletar(@PathVariable UUID id) {
-        return ResponseEntity.ok(precoService.deletar(id));
+    public Boolean deletar(@PathVariable UUID id) {
+        return precoService.deletar(id);
     }
+
+    @PostMapping("/adicionar-preco")
+    public PrecoDto adicionarPreco(@RequestBody PrecoDto precoDto) {
+        return precoService.adicionarPreco(precoDto);
+    }
+
 }

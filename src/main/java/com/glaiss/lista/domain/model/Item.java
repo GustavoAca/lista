@@ -21,20 +21,12 @@ public class Item extends EntityAbstract {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
     private String nome;
     private String peso;
     private String marca;
 
-    @ManyToMany
-    @JoinTable(
-            name = "itens_tem_precos",
-            joinColumns = @JoinColumn(name = "item_id"),
-            inverseJoinColumns = @JoinColumn(name = "preco_id")
-    )
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     @Builder.Default
     private List<Preco> precos = new LinkedList<>();
-
-    @OneToMany(mappedBy = "item")
-    @Builder.Default
-    private List<ItemLista> itensLista = new LinkedList<>();
 }

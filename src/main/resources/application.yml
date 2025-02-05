@@ -1,16 +1,24 @@
 spring:
   application:
     name: LISTA
+    version: @project.version@
   config:
     activate:
       on-profile: dev
   cloud:
+    discovery:
+      enabled: true
+      eureka:
+        instance:
+          hostname: localhost
+    client:
+      hostname: localhost
     loadbalancer:
       enabled: true
       ribbon:
         enabled: false
   datasource:
-    url: jdbc:postgresql://localhost:5432/glaiss?currentSchema=public&stringtype=unspecified&applicationName=app&options=-c%20TimeZone=UTC
+    url: jdbc:postgresql://localhost:5432/glaiss?TimeZone=America/Sao_Paulo
     username: att_lista
     password: lista_ddl_SaintBier
     driver-class-name: org.postgresql.Driver
@@ -27,10 +35,14 @@ spring:
     properties:
       hibernate:
         jdbc:
-          time_zone: UTC
+          time_zone: America/Sao_Paulo
   timezone: America/Sao_Paulo
+  security:
+    enabled: true
   cache:
     type: redis
+    redis:
+      time-to-live: 3600s
   data:
     redis:
       host: ${REDIS_HOST:localhost}

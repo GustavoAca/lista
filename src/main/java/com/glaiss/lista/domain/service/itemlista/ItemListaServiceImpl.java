@@ -1,5 +1,6 @@
 package com.glaiss.lista.domain.service.itemlista;
 
+import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.core.domain.service.BaseServiceImpl;
 import com.glaiss.core.exception.GlaissException;
 import com.glaiss.core.exception.RegistroNaoEncontradoException;
@@ -7,8 +8,6 @@ import com.glaiss.lista.domain.mapper.ItemListaMapper;
 import com.glaiss.lista.domain.model.ItemLista;
 import com.glaiss.lista.domain.model.dto.ItemListaDto;
 import com.glaiss.lista.domain.repository.itemlista.ItemListaRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -26,12 +25,12 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
         this.itemListaMapper = itemListaMapper;
     }
 
-    public Page<ItemListaDto> buscarItensListaPorListaCompraId(UUID compraId, Pageable pageable) {
-        Page<ItemLista> itensListaPagina = repo.findByListaCompra(compraId, pageable);
+    public ResponsePage<ItemListaDto> buscarItensListaPorListaCompraId(UUID compraId, Pageable pageable) {
+        ResponsePage<ItemLista> itensListaPagina = repo.findByListaCompraId(compraId, pageable);
         List<ItemListaDto> itensLista = itensListaPagina.getContent().stream()
                 .map(itemListaMapper::toDto)
                 .toList();
-        return new PageImpl<>(itensLista, pageable, itensListaPagina.getTotalElements());
+        return new ResponsePage<>(itensLista, pageable.getPageNumber(), pageable.getPageSize(), itensListaPagina.getTotalElements());
     }
 
     private ItemListaDto salvar(ItemListaDto itemListaDto) {
@@ -39,11 +38,11 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
     }
 
     @Override
-    public Page<ItemListaDto> listarPaginadoDto(Pageable pageable) {
-        Page<ItemLista> itensPaginado = listarPagina(pageable);
+    public ResponsePage<ItemListaDto> listarPaginadoDto(Pageable pageable) {
+        ResponsePage<ItemLista> itensPaginado = listarPagina(pageable);
         List<ItemListaDto> itens = itensPaginado.getContent().stream()
                 .map(itemListaMapper::toDto).toList();
-        return new PageImpl<>(itens, pageable, itensPaginado.getTotalElements());
+        return new ResponsePage<>(itens, pageable.getPageNumber(), pageable.getPageSize(), itensPaginado.getTotalElements());
     }
 
     @Override
