@@ -17,9 +17,9 @@ import java.util.UUID;
 @SuperBuilder
 public class ItemListaDto extends EntityAbstractDto {
 
-    private ItemDto item;
     private UUID id;
+    private UUID item;
+    private UUID listaCompraId;
     private BigDecimal preco;
     private Integer quantidade;
-    private UUID listaCompra;
 }

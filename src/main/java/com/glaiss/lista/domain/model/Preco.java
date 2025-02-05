@@ -2,12 +2,13 @@ package com.glaiss.lista.domain.model;
 
 import com.glaiss.core.domain.model.EntityAbstract;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.UUID;
 
 @Getter
@@ -23,12 +24,12 @@ public class Preco extends EntityAbstract {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    private BigDecimal preco;
+    private BigDecimal valor;
 
     @Column(name = "local_id")
     private UUID localId;
 
-    @ManyToMany(mappedBy = "precos")
-    @Builder.Default
-    private List<Item> itens = new LinkedList<>();
+    @ManyToOne
+    @JoinColumn(name = "item_id", nullable = false)
+    private Item item;
 }

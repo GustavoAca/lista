@@ -1,13 +1,12 @@
 package com.glaiss.lista.controller;
 
+import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.lista.domain.model.dto.ItemDto;
 import com.glaiss.lista.domain.service.item.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
@@ -23,25 +22,25 @@ public class ItemController {
         this.itemService = itemService;
     }
 
-    @Cacheable(value = "ItemListaDto", key = "#id")
+    @Cacheable(value = "Item", key = "#id")
     @GetMapping("/{id}")
-    public ResponseEntity<ItemDto> buscarPorId(@PathVariable UUID id) {
-        return ResponseEntity.ok(itemService.buscarPorIdDto(id));
+    public ItemDto buscarPorId(@PathVariable UUID id) {
+        return itemService.buscarPorIdDto(id);
     }
 
-    @Cacheable(value = "ItemListaDto", key = "#pageable.pageNumber")
+    @Cacheable(value = "Item", key = "#pageable.pageNumber")
     @GetMapping("/listar")
-    public ResponseEntity<Page<ItemDto>> listar(@PageableDefault(size = 20) Pageable pageable) {
-        return ResponseEntity.ok(itemService.listarPaginadoDto(pageable));
+    public ResponsePage<ItemDto> listar(@PageableDefault(size = 20) Pageable pageable) {
+        return itemService.listarPaginadoDto(pageable);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deletar(@PathVariable UUID id) {
-        return ResponseEntity.ok(itemService.deletar(id));
+    public Boolean deletar(@PathVariable UUID id) {
+        return itemService.deletar(id);
     }
 
     @PostMapping
-    public ResponseEntity<ItemDto> criar(@RequestBody ItemDto itemDto) {
-        return ResponseEntity.ok(itemService.criar(itemDto));
+    public ItemDto criar(@RequestBody ItemDto itemDto) {
+        return itemService.criar(itemDto);
     }
 }

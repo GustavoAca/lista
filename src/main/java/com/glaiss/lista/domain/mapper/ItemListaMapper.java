@@ -2,28 +2,21 @@ package com.glaiss.lista.domain.mapper;
 
 import com.glaiss.lista.domain.model.Item;
 import com.glaiss.lista.domain.model.ItemLista;
-import com.glaiss.lista.domain.model.dto.ItemDto;
 import com.glaiss.lista.domain.model.dto.ItemListaDto;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.util.UUID;
 
 @Component
 public class ItemListaMapper {
 
-    private final ItemMapper itemMapper;
-
-    @Autowired
-    public ItemListaMapper(ItemMapper itemMapper) {
-        this.itemMapper = itemMapper;
-    }
-
     public ItemLista toEntity(ItemListaDto dto) {
         return ItemLista.builder()
                 .id(dto.getId())
-                .item(toEntity(dto.getItem()))
                 .preco(dto.getPreco())
-                .listaCompra(dto.getListaCompra())
+                .listaCompraId(dto.getListaCompraId())
                 .quantidade(dto.getQuantidade())
+                .item(toItemEntity(dto.getItem()))
                 .createdBy(dto.getCreatedBy())
                 .createdDate(dto.getCreatedDate())
                 .modifiedBy(dto.getModifiedBy())
@@ -31,23 +24,21 @@ public class ItemListaMapper {
                 .build();
     }
 
-    private Item toEntity(ItemDto itemDto) {
-        return itemMapper.toEntity(itemDto);
+    private Item toItemEntity(UUID itemId) {
+        return Item.builder().id(itemId).build();
     }
 
     public ItemListaDto toDto(ItemLista entity) {
         return ItemListaDto.builder()
                 .id(entity.getId())
-                .item(itemToDo(entity.getItem()))
                 .preco(entity.getPreco())
                 .quantidade(entity.getQuantidade())
-                .listaCompra(entity.getListaCompra())
+                .listaCompraId(entity.getListaCompraId())
+                .item(entity.getItem().getId())
                 .createdBy(entity.getCreatedBy())
                 .createdDate(entity.getCreatedDate())
+                .modifiedBy(entity.getModifiedBy())
+                .modifiedDate(entity.getModifiedDate())
                 .build();
-    }
-
-    private ItemDto itemToDo(Item entity) {
-        return itemMapper.toDto(entity);
     }
 }

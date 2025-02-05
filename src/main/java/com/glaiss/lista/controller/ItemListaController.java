@@ -1,14 +1,13 @@
 package com.glaiss.lista.controller;
 
+import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.lista.domain.model.dto.ItemListaDto;
 import com.glaiss.lista.domain.service.itemlista.ItemListaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -25,39 +24,38 @@ public class ItemListaController {
         this.itemListaService = itemListaService;
     }
 
-    @Cacheable(value = "ItemListaDto", key = "#id")
+    @Cacheable(value = "ItemLista", key = "#id")
     @GetMapping("/{id}")
-    public ResponseEntity<ItemListaDto> buscarPorId(@PathVariable UUID id) {
-        return ResponseEntity.ok(itemListaService.buscarPorIdDto(id));
+    public ItemListaDto buscarPorId(@PathVariable UUID id) {
+        return itemListaService.buscarPorIdDto(id);
     }
 
-    @Cacheable(value = "ItemListaDto", key = "#pageable.pageNumber")
+    @Cacheable(value = "ItemLista", key = "#pageable.pageNumber")
     @GetMapping("/listar")
-    public ResponseEntity<Page<ItemListaDto>> listar(@PageableDefault(size = 20) Pageable pageable) {
-        return ResponseEntity.ok(itemListaService.listarPaginadoDto(pageable));
+    public ResponsePage<ItemListaDto> listar(@PageableDefault(size = 20) Pageable pageable) {
+        return itemListaService.listarPaginadoDto(pageable);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Boolean> deletar(@PathVariable UUID id) {
-        return ResponseEntity.ok(itemListaService.deletar(id));
+    public Boolean deletar(@PathVariable UUID id) {
+        return itemListaService.deletar(id);
     }
 
-    @Cacheable(value = "ItemListaDto", key = "#pageable.pageNumber + '_' + #listaCompraId")
+    @Cacheable(value = "ItemLista", key = "#pageable.pageNumber + '_' + #listaCompraId")
     @GetMapping("/{listaCompraId}/itens-lista")
-    public ResponseEntity<Page<ItemListaDto>> listarItens(@PathVariable UUID listaCompraId,
-                                                          @PageableDefault(size = 20) Pageable pageable) {
-        return ResponseEntity.ok(itemListaService.buscarItensListaPorListaCompraId(listaCompraId, pageable));
+    public ResponsePage<ItemListaDto> listarItens(@PathVariable UUID listaCompraId,
+                                                  @PageableDefault(size = 20) Pageable pageable) {
+        return itemListaService.buscarItensListaPorListaCompraId(listaCompraId, pageable);
     }
 
-    @CacheEvict(value = "ItemListaDto", key = "#id")
+    @CacheEvict(value = "ItemLista", key = "#id")
     @DeleteMapping("/lista-de-compra/itens-lista/{id}")
-    public ResponseEntity<Boolean> apagarItenLista(@PathVariable UUID id) {
-        return ResponseEntity.ok(itemListaService.removerItemLista(id));
+    public Boolean apagarItenLista(@PathVariable UUID id) {
+        return itemListaService.removerItemLista(id);
     }
 
-    @PostMapping("/itens-lista/local/{localId}")
-    public ResponseEntity<Boolean> adicionarItemLista(@PathVariable UUID localId,
-                                                      @RequestBody List<ItemListaDto> itensLista) {
-        return ResponseEntity.ok(itemListaService.adicionarItens(localId, itensLista));
+    @PostMapping("/adicionar-itens-a-lista")
+    public void adicionarItemLista(@RequestBody List<ItemListaDto> itensLista) {
+        itemListaService.adicionarItens(itensLista);
     }
 }

@@ -1,17 +1,19 @@
 package com.glaiss.lista.domain.service.itemlista;
 
+import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.core.domain.service.BaseServiceImpl;
-import com.glaiss.core.exception.GlaissException;
 import com.glaiss.core.exception.RegistroNaoEncontradoException;
+import com.glaiss.core.utils.SecurityContextUtils;
+import com.glaiss.lista.client.users.UsersService;
+import com.glaiss.lista.client.users.dto.ListaCompraDto;
 import com.glaiss.lista.domain.mapper.ItemListaMapper;
 import com.glaiss.lista.domain.model.ItemLista;
 import com.glaiss.lista.domain.model.dto.ItemListaDto;
 import com.glaiss.lista.domain.repository.itemlista.ItemListaRepository;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.UUID;
 
@@ -19,19 +21,22 @@ import java.util.UUID;
 public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemListaRepository> implements ItemListaService {
 
     private final ItemListaMapper itemListaMapper;
+    private final UsersService usersService;
 
     protected ItemListaServiceImpl(ItemListaRepository repo,
-                                   ItemListaMapper itemListaMapper) {
+                                   ItemListaMapper itemListaMapper,
+                                   UsersService usersService) {
         super(repo);
         this.itemListaMapper = itemListaMapper;
+        this.usersService = usersService;
     }
 
-    public Page<ItemListaDto> buscarItensListaPorListaCompraId(UUID compraId, Pageable pageable) {
-        Page<ItemLista> itensListaPagina = repo.findByListaCompra(compraId, pageable);
+    public ResponsePage<ItemListaDto> buscarItensListaPorListaCompraId(UUID compraId, Pageable pageable) {
+        ResponsePage<ItemLista> itensListaPagina = repo.findByListaCompraId(compraId, pageable);
         List<ItemListaDto> itensLista = itensListaPagina.getContent().stream()
                 .map(itemListaMapper::toDto)
                 .toList();
-        return new PageImpl<>(itensLista, pageable, itensListaPagina.getTotalElements());
+        return new ResponsePage<>(itensLista, pageable.getPageNumber(), pageable.getPageSize(), itensListaPagina.getTotalElements());
     }
 
     private ItemListaDto salvar(ItemListaDto itemListaDto) {
@@ -39,11 +44,11 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
     }
 
     @Override
-    public Page<ItemListaDto> listarPaginadoDto(Pageable pageable) {
-        Page<ItemLista> itensPaginado = listarPagina(pageable);
+    public ResponsePage<ItemListaDto> listarPaginadoDto(Pageable pageable) {
+        ResponsePage<ItemLista> itensPaginado = listarPagina(pageable);
         List<ItemListaDto> itens = itensPaginado.getContent().stream()
                 .map(itemListaMapper::toDto).toList();
-        return new PageImpl<>(itens, pageable, itensPaginado.getTotalElements());
+        return new ResponsePage<>(itens, pageable.getPageNumber(), pageable.getPageSize(), itensPaginado.getTotalElements());
     }
 
     @Override
@@ -56,15 +61,12 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
         return deletar(itemListaId);
     }
 
-    public Boolean adicionarItens(UUID localId, List<ItemListaDto> itensLista) {
-        try {
-            itensLista.forEach(i -> {
-                i.getItem().adicionarLocalDoPreco(localId);
-                salvar(i);
-            });
-            return Boolean.TRUE;
-        } catch (RuntimeException e) {
-            throw new GlaissException();
+    public void adicionarItens(List<ItemListaDto> itensLista) {
+        BigDecimal total = BigDecimal.ZERO;
+        for (ItemListaDto item : itensLista) {
+            salvar(item);
+            total = total.add(item.getPreco().multiply(BigDecimal.valueOf(item.getQuantidade())));
         }
+        usersService.atualizarValorTotal(new ListaCompraDto(itensLista.get(0).getListaCompraId(), SecurityContextUtils.getId(), total));
     }
 }

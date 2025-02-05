@@ -1,16 +1,18 @@
 package com.glaiss.lista.domain.service.item;
 
+import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.core.domain.service.BaseServiceImpl;
 import com.glaiss.core.exception.RegistroNaoEncontradoException;
 import com.glaiss.lista.domain.mapper.ItemMapper;
 import com.glaiss.lista.domain.model.Item;
 import com.glaiss.lista.domain.model.dto.ItemDto;
 import com.glaiss.lista.domain.repository.item.ItemRepository;
+import com.glaiss.lista.domain.service.preco.PrecoService;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,11 +20,13 @@ import java.util.UUID;
 public class ItemServiceImpl extends BaseServiceImpl<Item, UUID, ItemRepository> implements ItemService {
 
     private final ItemMapper itemMapper;
+    private final PrecoService precoService;
 
     protected ItemServiceImpl(ItemRepository repo,
-                              ItemMapper itemMapper) {
+                              ItemMapper itemMapper, PrecoService precoService) {
         super(repo);
         this.itemMapper = itemMapper;
+        this.precoService = precoService;
     }
 
     @Override
@@ -32,24 +36,22 @@ public class ItemServiceImpl extends BaseServiceImpl<Item, UUID, ItemRepository>
     }
 
     @Override
-    public Page<ItemDto> listarPaginadoDto(Pageable pageable) {
+    public ResponsePage<ItemDto> listarPaginadoDto(Pageable pageable) {
         Page<Item> itensPaginado = listarPagina(pageable);
         List<ItemDto> itens = itensPaginado.getContent().stream()
                 .map(itemMapper::toDto).toList();
-        return new PageImpl<>(itens, pageable, itensPaginado.getTotalElements());
+        return new ResponsePage<>(itens, pageable.getPageNumber(), pageable.getPageSize(), itensPaginado.getTotalElements());
     }
 
     @Override
     public ItemDto criar(ItemDto itemDto) {
-        return itemMapper.toDto(salvar(itemMapper.toEntity(itemDto)));
-    }
-
-    @Override
-    public ItemDto adicionarNovoPreco(ItemDto itemDto) {
-        Item item = buscarPorId(itemDto.getId())
-                .orElseThrow(() -> new RegistroNaoEncontradoException(itemDto.getId(), Item.class.getName()));
-        item.getPrecos().addAll(itemMapper.toEntity(itemDto).getPrecos());
-
-        return itemMapper.toDto(salvar(item));
+        var precos = itemDto.getPrecos();
+        itemDto.setPrecos(new ArrayList<>());
+        ItemDto itemSalvo = itemMapper.toDto(salvar(itemMapper.toEntity(itemDto)));
+        precos.forEach(p -> {
+            p.setItemId(itemSalvo.getId());
+            precoService.salvar(p);
+        });
+        return itemSalvo;
     }
 }
