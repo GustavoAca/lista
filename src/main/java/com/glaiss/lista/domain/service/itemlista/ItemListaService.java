@@ -16,7 +16,7 @@ public interface ItemListaService extends BaseService<ItemLista, UUID> {
 
     Boolean removerItemLista(UUID id);
 
-    Boolean adicionarItens(UUID localId, List<ItemListaDto> itensLista);
+    void adicionarItens(List<ItemListaDto> itensLista);
 
     ResponsePage<ItemListaDto> listarPaginadoDto(Pageable pageable);
 

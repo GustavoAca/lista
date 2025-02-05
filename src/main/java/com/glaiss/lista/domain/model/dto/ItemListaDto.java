@@ -18,8 +18,9 @@ import java.util.UUID;
 public class ItemListaDto extends EntityAbstractDto {
 
     private UUID id;
-    private ItemDto item;
+    private UUID item;
     private UUID listaCompraId;
     private BigDecimal preco;
+    private BigDecimal precoTotal;
     private Integer quantidade;
 }

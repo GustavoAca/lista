@@ -44,7 +44,7 @@ public class ItemListaController {
     @Cacheable(value = "ItemLista", key = "#pageable.pageNumber + '_' + #listaCompraId")
     @GetMapping("/{listaCompraId}/itens-lista")
     public ResponsePage<ItemListaDto> listarItens(@PathVariable UUID listaCompraId,
-                                                          @PageableDefault(size = 20) Pageable pageable) {
+                                                  @PageableDefault(size = 20) Pageable pageable) {
         return itemListaService.buscarItensListaPorListaCompraId(listaCompraId, pageable);
     }
 
@@ -54,9 +54,8 @@ public class ItemListaController {
         return itemListaService.removerItemLista(id);
     }
 
-    @PostMapping("/itens-lista/local/{localId}")
-    public Boolean adicionarItemLista(@PathVariable UUID localId,
-                                                      @RequestBody List<ItemListaDto> itensLista) {
-        return itemListaService.adicionarItens(localId, itensLista);
+    @PostMapping("/adicionar-itens-a-lista")
+    public void adicionarItemLista(@RequestBody List<ItemListaDto> itensLista) {
+        itemListaService.adicionarItens(itensLista);
     }
 }

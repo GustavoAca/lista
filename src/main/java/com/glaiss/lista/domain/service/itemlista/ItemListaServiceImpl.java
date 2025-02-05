@@ -2,7 +2,6 @@ package com.glaiss.lista.domain.service.itemlista;
 
 import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.core.domain.service.BaseServiceImpl;
-import com.glaiss.core.exception.GlaissException;
 import com.glaiss.core.exception.RegistroNaoEncontradoException;
 import com.glaiss.lista.domain.mapper.ItemListaMapper;
 import com.glaiss.lista.domain.model.ItemLista;
@@ -55,15 +54,7 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
         return deletar(itemListaId);
     }
 
-    public Boolean adicionarItens(UUID localId, List<ItemListaDto> itensLista) {
-        try {
-            itensLista.forEach(i -> {
-                i.getItem().adicionarLocalDoPreco(localId);
-                salvar(i);
-            });
-            return Boolean.TRUE;
-        } catch (RuntimeException e) {
-            throw new GlaissException();
-        }
+    public void adicionarItens(List<ItemListaDto> itensLista) {
+        itensLista.forEach(this::salvar);
     }
 }
