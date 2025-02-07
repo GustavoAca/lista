@@ -4,11 +4,13 @@ import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.lista.domain.model.dto.ItemDto;
 import com.glaiss.lista.domain.service.item.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -34,12 +36,14 @@ public class ItemController {
         return itemService.listarPaginadoDto(pageable);
     }
 
-    @DeleteMapping("/{id}")
-    public Boolean deletar(@PathVariable UUID id) {
-        return itemService.deletar(id);
+    @DeleteMapping
+    @CacheEvict(value = "ListaCompra", allEntries = true)
+    public void deletar(@RequestBody List<UUID> id) {
+        itemService.deletar(id);
     }
 
     @PostMapping
+    @CacheEvict(value = "ListaCompra", allEntries = true)
     public ItemDto criar(@RequestBody ItemDto itemDto) {
         return itemService.criar(itemDto);
     }

@@ -6,6 +6,7 @@ import com.glaiss.lista.domain.model.Item;
 import com.glaiss.lista.domain.model.dto.ItemDto;
 import org.springframework.data.domain.Pageable;
 
+import java.util.List;
 import java.util.UUID;
 
 public interface ItemService extends BaseService<Item, UUID> {
@@ -15,4 +16,6 @@ public interface ItemService extends BaseService<Item, UUID> {
    ResponsePage<ItemDto> listarPaginadoDto(Pageable pageable);
 
    ItemDto criar(ItemDto itemDto);
+
+    void deletar(List<UUID> itensId);
 }

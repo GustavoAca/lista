@@ -1,7 +1,6 @@
 package com.glaiss.lista.config;
 
 import com.glaiss.core.security.JwtAuthentication;
-import com.glaiss.core.security.Privilegio;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -27,7 +26,7 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/actuator/**").hasAuthority(Privilegio.ROLE_PREMIUM.name())
+                        .requestMatchers("/actuator/**").permitAll()
                         .anyRequest().authenticated())
                 .csrf(AbstractHttpConfigurer::disable)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))

@@ -54,4 +54,11 @@ public class ItemServiceImpl extends BaseServiceImpl<Item, UUID, ItemRepository>
         });
         return itemSalvo;
     }
+
+    @Override
+    public void deletar(List<UUID> itensId) {
+        for (UUID id : itensId) {
+            deletar(id);
+        }
+    }
 }

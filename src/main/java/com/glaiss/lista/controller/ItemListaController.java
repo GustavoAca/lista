@@ -37,6 +37,7 @@ public class ItemListaController {
     }
 
     @DeleteMapping("/{id}")
+    @CacheEvict(value = "ItemLista", allEntries = true)
     public Boolean deletar(@PathVariable UUID id) {
         return itemListaService.deletar(id);
     }
@@ -48,13 +49,8 @@ public class ItemListaController {
         return itemListaService.buscarItensListaPorListaCompraId(listaCompraId, pageable);
     }
 
-    @CacheEvict(value = "ItemLista", key = "#id")
-    @DeleteMapping("/lista-de-compra/itens-lista/{id}")
-    public Boolean apagarItenLista(@PathVariable UUID id) {
-        return itemListaService.removerItemLista(id);
-    }
-
     @PostMapping("/adicionar-itens-a-lista")
+    @CacheEvict(value = "ItemLista", allEntries = true)
     public void adicionarItemLista(@RequestBody List<ItemListaDto> itensLista) {
         itemListaService.adicionarItens(itensLista);
     }

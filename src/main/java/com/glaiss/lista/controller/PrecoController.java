@@ -35,15 +35,15 @@ public class PrecoController {
         return precoService.buscarPrecoPorItemId(itemId, pageable);
     }
 
-    @CacheEvict(value = "Preco", key = "#id")
     @DeleteMapping("/{id}")
+    @CacheEvict(value = "Preco", allEntries = true)
     public Boolean deletar(@PathVariable UUID id) {
         return precoService.deletar(id);
     }
 
-    @PostMapping("/adicionar-preco")
+    @PatchMapping("/adicionar-preco")
+    @CacheEvict(value = "Preco", allEntries = true)
     public PrecoDto adicionarPreco(@RequestBody PrecoDto precoDto) {
         return precoService.adicionarPreco(precoDto);
     }
-
 }

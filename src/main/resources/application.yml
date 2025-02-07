@@ -1,6 +1,6 @@
 spring:
   application:
-    name: LISTA
+    name: lista
     version: @project.version@
   config:
     activate:

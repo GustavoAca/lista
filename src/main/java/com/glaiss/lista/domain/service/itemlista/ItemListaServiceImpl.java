@@ -57,10 +57,6 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
                 .orElseThrow(() -> new RegistroNaoEncontradoException(id, "ItemLista")));
     }
 
-    public Boolean removerItemLista(UUID itemListaId) {
-        return deletar(itemListaId);
-    }
-
     public void adicionarItens(List<ItemListaDto> itensLista) {
         BigDecimal total = BigDecimal.ZERO;
         for (ItemListaDto item : itensLista) {
