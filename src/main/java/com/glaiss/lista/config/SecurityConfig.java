@@ -20,7 +20,7 @@ import java.security.interfaces.RSAPublicKey;
 @Slf4j
 public class SecurityConfig {
 
-    @Value("${security.oauth2.resource.jwt.key}")
+    @Value("${jwt.public.key}")
     private RSAPublicKey publicKey;
 
     @Bean
