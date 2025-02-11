@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.glaiss</groupId>
 	<artifactId>lista</artifactId>
-	<version>0.16.0</version>
+	<version>0.17.0</version>
 	<name>lista</name>
 	<description>Projeto de gerenciamento de listas de compras</description>
 	<url/>
