@@ -29,8 +29,16 @@ spring:
     redis:
       time-to-live: 3600s
   redis:
-    host: localhost
+    host: redis
     port: 6379
+    ssl:
+      enabled: false
+    timeout: 5000
+    jedis:
+      pool:
+        max-idle: 10
+        min-idle: 1
+        max-total: 20
   flyway:
     user: att_lista
     password: lista_ddl_SaintBier
@@ -93,9 +101,18 @@ spring:
   flyway:
     user: ${USER_DB}
     password: ${PASSWORD_DB}
-  redis:
-    host: ${REDIS_HOST}
-    port: ${REDIS_PORT}
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      ssl:
+        enabled: false
+      timeout: 5000
+      jedis:
+        pool:
+          max-idle: 10
+          min-idle: 1
+          max-total: 20
   cloud:
     discovery:
       eureka:
