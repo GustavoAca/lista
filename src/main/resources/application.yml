@@ -1,6 +1,6 @@
 spring:
   application:
-    name: LISTA
+    name: lista
     version: @project.version@
   cloud:
     discovery:
@@ -40,11 +40,11 @@ spring:
         min-idle: 1
         max-total: 20
   flyway:
-    user: att_lista
-    password: lista_ddl_SaintBier
+    user: gl_lista
+    password: gl_lista
     locations: classpath:db/migration
     table: FLYWAY_SCHEMA_HISTORY
-    schemas: att_lista
+    schemas: gl_lista
 
 server:
   port: 8193
@@ -77,6 +77,8 @@ jwt:
       LeCqCtLrXWCHngGnU9eLsEa1OR94aR9gcIuUJhu/QjSDbARjoNYv7FSnBFeXYqahcT3WGcos7M2RZh6SZnVlN7aZ+Ve1CVv5BCVJf7lwEpGEJjGtipx6XJoERO7jPhwie+dYmcpP4yTCvqGlTGPWyYPyi6QBZPznkcCKcqs2MPtXnNUm0PuLkyaMycvwIDAQAB
       -----END PUBLIC KEY-----
 
+logstash:
+  destination: localhost:5000
 ---
 spring:
   config:
@@ -84,8 +86,8 @@ spring:
       on-profile: dev
   datasource:
     url: jdbc:postgresql://localhost:5432/glaiss?TimeZone=America/Sao_Paulo
-    username: att_lista
-    password: lista_ddl_SaintBier
+    username: gl_lista
+    password: gl_lista
     driver-class-name: org.postgresql.Driver
 
 ---
@@ -126,3 +128,5 @@ eureka:
       defaultZone: ${URL_DISCOVERY}
 server:
   port: ${PORT}
+logstash:
+  destination: ${LOGSTASH}
