@@ -8,7 +8,6 @@ import com.glaiss.lista.domain.model.Item;
 import com.glaiss.lista.domain.model.dto.ItemDto;
 import com.glaiss.lista.domain.repository.item.ItemRepository;
 import com.glaiss.lista.domain.service.preco.PrecoService;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-@Slf4j
 public class ItemServiceImpl extends BaseServiceImpl<Item, UUID, ItemRepository> implements ItemService {
 
     private final ItemMapper itemMapper;
@@ -33,7 +31,6 @@ public class ItemServiceImpl extends BaseServiceImpl<Item, UUID, ItemRepository>
 
     @Override
     public ItemDto buscarPorIdDto(UUID id) {
-        log.error("Buscando com id: {}", id);
         return itemMapper.toDto(buscarPorId(id)
                 .orElseThrow(() -> new RegistroNaoEncontradoException(id, Item.class.getName())));
     }
