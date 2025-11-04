@@ -19,4 +19,6 @@ public interface ItemListaService extends BaseService<ItemLista, UUID> {
     ResponsePage<ItemListaDto> listarPaginadoDto(Pageable pageable);
 
     ItemListaDto buscarPorIdDto(UUID id);
+
+    ItemListaDto salvar(ItemListaDto itemListaDto);
 }

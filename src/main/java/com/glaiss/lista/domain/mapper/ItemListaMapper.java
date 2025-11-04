@@ -2,6 +2,7 @@ package com.glaiss.lista.domain.mapper;
 
 import com.glaiss.lista.domain.model.Item;
 import com.glaiss.lista.domain.model.ItemLista;
+import com.glaiss.lista.domain.model.ListaCompra;
 import com.glaiss.lista.domain.model.dto.ItemListaDto;
 import org.springframework.stereotype.Component;
 
@@ -14,7 +15,7 @@ public class ItemListaMapper {
         return ItemLista.builder()
                 .id(dto.getId())
                 .preco(dto.getPreco())
-                .listaCompraId(dto.getListaCompraId())
+                .listaCompra(ListaCompra.builder().id(dto.getListaCompraId()).build())
                 .quantidade(dto.getQuantidade())
                 .item(toItemEntity(dto.getItem()))
                 .createdBy(dto.getCreatedBy())
@@ -33,7 +34,7 @@ public class ItemListaMapper {
                 .id(entity.getId())
                 .preco(entity.getPreco())
                 .quantidade(entity.getQuantidade())
-                .listaCompraId(entity.getListaCompraId())
+                .listaCompraId(entity.getListaCompra().getId())
                 .item(entity.getItem().getId())
                 .createdBy(entity.getCreatedBy())
                 .createdDate(entity.getCreatedDate())

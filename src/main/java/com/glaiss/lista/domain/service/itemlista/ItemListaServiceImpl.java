@@ -4,12 +4,13 @@ import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.core.domain.service.BaseServiceImpl;
 import com.glaiss.core.exception.RegistroNaoEncontradoException;
 import com.glaiss.core.utils.SecurityContextUtils;
-import com.glaiss.lista.client.users.UsersService;
-import com.glaiss.lista.client.users.dto.ListaCompraDto;
 import com.glaiss.lista.domain.mapper.ItemListaMapper;
 import com.glaiss.lista.domain.model.ItemLista;
+import com.glaiss.lista.domain.model.ListaCompra;
 import com.glaiss.lista.domain.model.dto.ItemListaDto;
+import com.glaiss.lista.domain.model.dto.ListaCompraDto;
 import com.glaiss.lista.domain.repository.itemlista.ItemListaRepository;
+import com.glaiss.lista.domain.service.listascompra.ListaCompraService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -21,14 +22,11 @@ import java.util.UUID;
 public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemListaRepository> implements ItemListaService {
 
     private final ItemListaMapper itemListaMapper;
-    private final UsersService usersService;
 
     protected ItemListaServiceImpl(ItemListaRepository repo,
-                                   ItemListaMapper itemListaMapper,
-                                   UsersService usersService) {
+                                   ItemListaMapper itemListaMapper) {
         super(repo);
         this.itemListaMapper = itemListaMapper;
-        this.usersService = usersService;
     }
 
     public ResponsePage<ItemListaDto> buscarItensListaPorListaCompraId(UUID compraId, Pageable pageable) {
@@ -39,8 +37,11 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
         return new ResponsePage<>(itensLista, pageable.getPageNumber(), pageable.getPageSize(), itensListaPagina.getTotalElements());
     }
 
-    private ItemListaDto salvar(ItemListaDto itemListaDto) {
-        return itemListaMapper.toDto(salvar(itemListaMapper.toEntity(itemListaDto)));
+    @Override
+    public ItemListaDto salvar(ItemListaDto itemListaDto) {
+        ItemLista entity = itemListaMapper.toEntity(itemListaDto);
+        ItemLista salvo = salvar(entity);
+        return itemListaMapper.toDto(salvo);
     }
 
     @Override
@@ -63,6 +64,10 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
             salvar(item);
             total = total.add(item.getPreco().multiply(BigDecimal.valueOf(item.getQuantidade())));
         }
-        usersService.atualizarValorTotal(new ListaCompraDto(itensLista.get(0).getListaCompraId(), SecurityContextUtils.getId(), total));
+//        listaCompraService.atualizarValorTotal(ListaCompraDto.builder()
+//                .id(itensLista.get(0).getListaCompraId())
+//                .valorTotal(total)
+//                .usuarioId(SecurityContextUtils.getId())
+//                .build());
     }
 }
