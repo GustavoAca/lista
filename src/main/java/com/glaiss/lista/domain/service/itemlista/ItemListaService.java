@@ -2,21 +2,20 @@ package com.glaiss.lista.domain.service.itemlista;
 
 import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.core.domain.service.BaseService;
+import com.glaiss.lista.controller.dto.ItemListaDTO;
 import com.glaiss.lista.domain.model.ItemLista;
-import com.glaiss.lista.domain.model.dto.ItemListaDto;
 import org.springframework.data.domain.Pageable;
 
 import java.util.List;
 import java.util.UUID;
 
-
 public interface ItemListaService extends BaseService<ItemLista, UUID> {
 
-    ResponsePage<ItemListaDto> buscarItensListaPorListaCompraId(UUID compraId, Pageable pageable);
+    ResponsePage<ItemListaDTO> listarItensPorListaCompraIdPaginaDTO(Pageable pageable, UUID listId);
 
-    void adicionarItens(List<ItemListaDto> itensLista);
+    List<ItemListaDTO> adicionaLista(UUID listaId, List<ItemListaDTO> itemDTO);
 
-    ResponsePage<ItemListaDto> listarPaginadoDto(Pageable pageable);
+    void salvarAll(List<ItemLista> itemListas);
 
-    ItemListaDto buscarPorIdDto(UUID id);
+    Boolean removerDaLista(UUID listaId, List<UUID> itensLista);
 }

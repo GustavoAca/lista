@@ -3,16 +3,14 @@ package com.glaiss.lista.domain.service.item;
 import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.core.domain.service.BaseServiceImpl;
 import com.glaiss.core.exception.RegistroNaoEncontradoException;
+import com.glaiss.lista.controller.dto.ItemDTO;
 import com.glaiss.lista.domain.mapper.ItemMapper;
 import com.glaiss.lista.domain.model.Item;
-import com.glaiss.lista.domain.model.dto.ItemDto;
-import com.glaiss.lista.domain.repository.item.ItemRepository;
-import com.glaiss.lista.domain.service.preco.PrecoService;
+import com.glaiss.lista.domain.repository.ItemRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,39 +18,23 @@ import java.util.UUID;
 public class ItemServiceImpl extends BaseServiceImpl<Item, UUID, ItemRepository> implements ItemService {
 
     private final ItemMapper itemMapper;
-    private final PrecoService precoService;
 
     protected ItemServiceImpl(ItemRepository repo,
-                              ItemMapper itemMapper, PrecoService precoService) {
+                              ItemMapper itemMapper) {
         super(repo);
         this.itemMapper = itemMapper;
-        this.precoService = precoService;
     }
 
-    @Override
-    public ItemDto buscarPorIdDto(UUID id) {
-        return itemMapper.toDto(buscarPorId(id)
-                .orElseThrow(() -> new RegistroNaoEncontradoException(id, Item.class.getName())));
+    public ItemDTO salvar(ItemDTO item) {
+        Item itemEntity= itemMapper.toEntity(item);
+        itemEntity.setIsAtivo(Boolean.TRUE);
+        return itemMapper.toDto(salvar(itemEntity));
     }
 
-    @Override
-    public ResponsePage<ItemDto> listarPaginadoDto(Pageable pageable) {
-        Page<Item> itensPaginado = listarPagina(pageable);
-        List<ItemDto> itens = itensPaginado.getContent().stream()
-                .map(itemMapper::toDto).toList();
-        return new ResponsePage<>(itens, pageable.getPageNumber(), pageable.getPageSize(), itensPaginado.getTotalElements());
-    }
-
-    @Override
-    public ItemDto criar(ItemDto itemDto) {
-        var precos = itemDto.getPrecos();
-        itemDto.setPrecos(new ArrayList<>());
-        ItemDto itemSalvo = itemMapper.toDto(salvar(itemMapper.toEntity(itemDto)));
-        precos.forEach(p -> {
-            p.setItemId(itemSalvo.getId());
-            precoService.salvar(p);
-        });
-        return itemSalvo;
+    public ResponsePage<ItemDTO> listarPaginaDTO(org.springframework.data.domain.Pageable pageable){
+        Page<Item> itemPage = repo.findAll(pageable);
+        var listaItem = itemPage.getContent().stream().map(itemMapper::toDto).toList();
+        return new ResponsePage<>(listaItem, pageable.getPageNumber(), pageable.getPageSize(), itemPage.getTotalElements());
     }
 
     @Override
@@ -60,5 +42,18 @@ public class ItemServiceImpl extends BaseServiceImpl<Item, UUID, ItemRepository>
         for (UUID id : itensId) {
             deletar(id);
         }
+    }
+
+    @Override
+    public ItemDTO buscarPorIdDto(UUID id) {
+        return itemMapper.toDto(buscarPorId(id)
+                .orElseThrow(() -> new RegistroNaoEncontradoException(id, Item.class.getName())));
+    }
+
+    @Override
+    public ResponsePage<ItemDTO> buscarPorNomeDto(Pageable pageable, String nome){
+        Page<Item> itemPage = repo.findByNomeContainingIgnoreCase(pageable, nome);
+        var listaItem = itemPage.getContent().stream().map(itemMapper::toDto).toList();
+        return new ResponsePage<>(listaItem, pageable.getPageNumber(), pageable.getPageSize(), itemPage.getTotalElements());
     }
 }

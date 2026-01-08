@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 @Configuration
 @EntityScan(basePackages = "com.glaiss.lista.domain.model")
-@EnableJpaRepositories(basePackages = {"com.glaiss.lista.domain.repository"})
+@EnableJpaRepositories(basePackages = {"com.glaiss.lista.domain"})
 public class RepositoryConfig {
 
 }

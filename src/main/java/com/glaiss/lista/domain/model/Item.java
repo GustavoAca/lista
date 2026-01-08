@@ -23,10 +23,13 @@ public class Item extends EntityAbstract {
     private UUID id;
 
     private String nome;
-    private String peso;
-    private String marca;
 
-    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private String descricao;
+
+    @Column(name = "is_ativo")
     @Builder.Default
-    private List<Preco> precos = new LinkedList<>();
+    private Boolean isAtivo = Boolean.TRUE;
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private List<ItemOferta> itemPromocaos = new LinkedList<>();
 }

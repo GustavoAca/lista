@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.util.Objects;
 import java.util.UUID;
 
 @Getter
@@ -24,17 +25,36 @@ public class ItemLista extends EntityAbstract {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "item_id", nullable = false)
-    private Item item;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "listas_compra_id", nullable = false)
+    private ListaCompra listaCompra;
 
-    @Column(name = "lista_compra_id")
-    private UUID listaCompraId;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_oferta_id", nullable = false)
+    private ItemOferta itemOferta;
 
-    @Column(nullable = false, precision = 10, scale = 2)
-    private BigDecimal preco;
+    private short quantidade;
 
-    @Column(nullable = false)
-    private Integer quantidade;
+    @Column(name = "has_promocao_ativa")
+    private Boolean hasPromocaoAtiva;
+
+    @Column(name = "data_inicio_promocao")
+    private LocalDateTime dataInicioPromocao;
+
+    @Column(name = "data_final_promocao")
+    private LocalDateTime dataFinalPromocao;
+
+    public UUID getListaCompraId(){
+        if(Objects.isNull(this.getListaCompra()) || Objects.isNull(this.getListaCompra().getId())){
+            return null;
+        }
+        return this.getListaCompra().getId();
+    }
+
+    public UUID getItemOfertaId(){
+        if(Objects.isNull(this.getItemOferta()) || Objects.isNull(this.getItemOferta().getId())){
+            return null;
+        }
+        return this.getItemOferta().getId();
+    }
 }
-
