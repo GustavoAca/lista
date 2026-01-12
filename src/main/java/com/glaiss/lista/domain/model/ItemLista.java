@@ -8,7 +8,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
-import java.time.LocalDateTime;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -35,15 +34,6 @@ public class ItemLista extends EntityAbstract {
 
     private short quantidade;
 
-    @Column(name = "has_promocao_ativa")
-    private Boolean hasPromocaoAtiva;
-
-    @Column(name = "data_inicio_promocao")
-    private LocalDateTime dataInicioPromocao;
-
-    @Column(name = "data_final_promocao")
-    private LocalDateTime dataFinalPromocao;
-
     public UUID getListaCompraId(){
         if(Objects.isNull(this.getListaCompra()) || Objects.isNull(this.getListaCompra().getId())){
             return null;
@@ -56,5 +46,9 @@ public class ItemLista extends EntityAbstract {
             return null;
         }
         return this.getItemOferta().getId();
+    }
+
+    public void adicionarQuantidade(short quantidadeAdicional){
+        this.quantidade += quantidadeAdicional;
     }
 }

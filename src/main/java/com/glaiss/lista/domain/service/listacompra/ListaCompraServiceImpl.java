@@ -4,6 +4,7 @@ import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.core.domain.service.BaseServiceImpl;
 import com.glaiss.core.exception.RegistroNaoEncontradoException;
 import com.glaiss.core.utils.SecurityContextUtils;
+import com.glaiss.lista.controller.dto.ItemAdicionadoDTO;
 import com.glaiss.lista.controller.dto.ItemListaDTO;
 import com.glaiss.lista.controller.dto.ListaCompraDTO;
 import com.glaiss.lista.domain.mapper.ListaCompraMapper;
@@ -86,7 +87,7 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
     }
 
     @Override
-    public List<ItemListaDTO> adicionarItemLista(UUID listaId, List<ItemListaDTO> itemDTO) {
+    public List<ItemListaDTO> adicionarItemLista(UUID listaId, List<ItemAdicionadoDTO> itemDTO) {
         return itemListaService.adicionaLista(listaId, itemDTO);
     }
 

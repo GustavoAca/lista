@@ -1,6 +1,7 @@
 package com.glaiss.lista.controller;
 
 import com.glaiss.core.domain.model.ResponsePage;
+import com.glaiss.lista.controller.dto.ItemAdicionadoDTO;
 import com.glaiss.lista.controller.dto.ItemListaDTO;
 import com.glaiss.lista.controller.dto.ListaCompraDTO;
 import com.glaiss.lista.domain.service.listacompra.ListaCompraService;
@@ -25,8 +26,8 @@ public class ListaCompraController {
 
     @GetMapping("/{listaId}")
     public ResponsePage<ItemListaDTO> listarItensPorListaCompraIdPaginaDTO(@PageableDefault(size = 20) Pageable pageable,
-                                                                           @PathVariable UUID listId) {
-        return listaCompraService.listarItensPorListaCompraIdPaginaDTO(pageable, listId);
+                                                                           @PathVariable UUID listaId) {
+        return listaCompraService.listarItensPorListaCompraIdPaginaDTO(pageable, listaId);
     }
 
     @GetMapping
@@ -36,7 +37,7 @@ public class ListaCompraController {
 
     @PostMapping("/{listaId}/adicionar-itens")
     public List<ItemListaDTO> adicionarNaLista(@Valid @PathVariable UUID listaId,
-                                               @Valid @RequestBody List<ItemListaDTO> itemDTO) {
+                                               @Valid @RequestBody List<ItemAdicionadoDTO> itemDTO) {
         return listaCompraService.adicionarItemLista(listaId, itemDTO);
     }
 
