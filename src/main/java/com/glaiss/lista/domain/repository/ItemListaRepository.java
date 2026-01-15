@@ -2,12 +2,12 @@ package com.glaiss.lista.domain.repository;
 
 import com.glaiss.core.domain.repository.BaseRepository;
 import com.glaiss.lista.domain.model.ItemLista;
-import feign.Param;
-import jakarta.validation.constraints.NotNull;
+import com.glaiss.lista.domain.model.dto.projection.ItemListaProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -17,12 +17,20 @@ import java.util.UUID;
 @Repository
 public interface ItemListaRepository extends BaseRepository<ItemLista, UUID> {
 
-    Page<ItemLista> findAllByListaCompra_Id(Pageable pageable, UUID listaCompraId);
+    @Query(value = "SELECT i FROM ItemLista i " +
+            "JOIN FETCH i.itemOferta io " +
+            "JOIN FETCH io.item " +
+            "WHERE i.listaCompra.id = :listaCompraId",
+            countQuery = "SELECT count(i) FROM ItemLista i WHERE i.listaCompra.id = :listaCompraId")
+    Page<ItemListaProjection> findAllByListaCompra_Id(Pageable pageable, @Param("listaCompraId") UUID listaCompraId);
+
+    @Query("SELECT i FROM ItemLista i JOIN FETCH i.itemOferta WHERE i.listaCompra.id = :listaId")
+    List<ItemLista> findAllByListaCompraId(@Param("listaId") UUID listaId);
 
     @Modifying(clearAutomatically = true)
     @Query("""
                 delete from ItemLista i
-                where i.listaCompra = :listaId
+                where i.listaCompra.id = :listaId
                   and i.id in :itensIds
             """)
     int deleteItensDaLista(
@@ -30,5 +38,5 @@ public interface ItemListaRepository extends BaseRepository<ItemLista, UUID> {
             @Param("itensIds") List<UUID> itensIds
     );
 
-    Optional<ItemLista> findByListaCompra_IdAndItemOferta_Id(UUID listaId, @NotNull UUID uuid);
+    Optional<ItemLista> findByListaCompra_IdAndItemOferta_Id(UUID listaId, UUID uuid);
 }

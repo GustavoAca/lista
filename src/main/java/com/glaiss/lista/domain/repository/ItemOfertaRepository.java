@@ -2,6 +2,7 @@ package com.glaiss.lista.domain.repository;
 
 import com.glaiss.core.domain.repository.BaseRepository;
 import com.glaiss.lista.domain.model.ItemOferta;
+import com.glaiss.lista.domain.model.dto.projection.vendedor.ItemOfertaProjection;
 import feign.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,4 +23,11 @@ public interface ItemOfertaRepository extends BaseRepository<ItemOferta, UUID> {
             Pageable pageable
     );
 
+    @Query("""
+               SELECT io
+               FROM ItemOferta io
+               WHERE io.vendedor.id = :vendedorId
+            """)
+    Page<ItemOfertaProjection> findAllByVendedorId(@Param("vendedorId") UUID vendedorId,
+                                                   Pageable pageable);
 }

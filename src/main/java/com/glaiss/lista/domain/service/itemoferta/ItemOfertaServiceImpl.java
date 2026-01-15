@@ -8,6 +8,7 @@ import com.glaiss.lista.domain.model.ItemOferta;
 import com.glaiss.lista.domain.model.dto.HistoricoPrecoDTO;
 import com.glaiss.lista.domain.model.dto.ItemOfertaDTO;
 import com.glaiss.lista.domain.model.dto.PrecoReportadoPendenteDTO;
+import com.glaiss.lista.domain.model.dto.projection.vendedor.ItemOfertaProjection;
 import com.glaiss.lista.domain.repository.ItemOfertaRepository;
 import com.glaiss.lista.domain.service.historicopreco.HistoricoPrecoService;
 import jakarta.transaction.Transactional;
@@ -112,5 +113,11 @@ public class ItemOfertaServiceImpl extends BaseServiceImpl<ItemOferta, UUID, Ite
         Page<ItemOferta> itemPage = repo.findByItemId(itemId, pageable);
         var listaItem = itemPage.getContent().stream().map(itemOfertaMapper::toDto).toList();
         return new ResponsePage<>(listaItem, pageable.getPageNumber(), pageable.getPageSize(), itemPage.getTotalElements());
+    }
+
+    @Override
+    public ResponsePage<ItemOfertaProjection> listarPaginaPorVendedor(Pageable pageable, UUID vendedorId){
+        Page<ItemOfertaProjection> itemPage = repo.findAllByVendedorId(vendedorId, pageable);
+        return new ResponsePage<>(itemPage);
     }
 }

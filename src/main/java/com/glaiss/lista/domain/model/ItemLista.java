@@ -48,7 +48,11 @@ public class ItemLista extends EntityAbstract {
         return this.getItemOferta().getId();
     }
 
-    public void adicionarQuantidade(short quantidadeAdicional){
-        this.quantidade += quantidadeAdicional;
+    public void alterarQuantidade(short quantidadeAdicional){
+        this.quantidade = quantidadeAdicional;
+    }
+
+    public void adicionarQuantidade(short quantidade){
+        this.quantidade += quantidade;
     }
 }

@@ -27,6 +27,8 @@ public class ListaCompra extends EntityAbstract {
     @Column(name = "usuario_id", nullable = false)
     private UUID usuarioId;
 
+    private String nome;
+
     @Column(name = "valor_total")
     @ValorBigDecimal
     @Builder.Default
@@ -37,4 +39,8 @@ public class ListaCompra extends EntityAbstract {
 
     @OneToMany(mappedBy = "listaCompra", cascade = CascadeType.ALL)
     private List<ItemLista> itensLista = new LinkedList<>();
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "status_lista_codigo", nullable = false)
+    private StatusLista statusLista;
 }

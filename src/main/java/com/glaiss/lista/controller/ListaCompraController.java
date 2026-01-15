@@ -2,8 +2,10 @@ package com.glaiss.lista.controller;
 
 import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.lista.controller.dto.ItemAdicionadoDTO;
+import com.glaiss.lista.controller.dto.ItemAlteradoDTO;
 import com.glaiss.lista.controller.dto.ItemListaDTO;
 import com.glaiss.lista.controller.dto.ListaCompraDTO;
+import com.glaiss.lista.domain.model.dto.projection.ItemListaProjection;
 import com.glaiss.lista.domain.service.listacompra.ListaCompraService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
@@ -24,10 +26,15 @@ public class ListaCompraController {
         this.listaCompraService = listaCompraService;
     }
 
-    @GetMapping("/{listaId}")
-    public ResponsePage<ItemListaDTO> listarItensPorListaCompraIdPaginaDTO(@PageableDefault(size = 20) Pageable pageable,
-                                                                           @PathVariable UUID listaId) {
+    @GetMapping("/{listaId}/itens")
+    public ResponsePage<ItemListaProjection> listarItensPorListaCompraIdPaginaDTO(@PageableDefault(size = 20) Pageable pageable,
+                                                                                  @PathVariable UUID listaId) {
         return listaCompraService.listarItensPorListaCompraIdPaginaDTO(pageable, listaId);
+    }
+
+    @GetMapping("/{listaId}")
+    public ListaCompraDTO listarPorId(@PathVariable UUID listaId) {
+        return listaCompraService.buscarPorIdDto(listaId);
     }
 
     @GetMapping
@@ -41,10 +48,10 @@ public class ListaCompraController {
         return listaCompraService.adicionarItemLista(listaId, itemDTO);
     }
 
-    @DeleteMapping("/{listaId}/remover-itens")
-    public Boolean removerDaLista(@Valid @PathVariable UUID listaId,
-                                  @Valid @RequestBody List<UUID> itensLista) {
-        return listaCompraService.removerDaLista(listaId, itensLista);
+    @PutMapping("/{listaId}/alterar-itens")
+    public Boolean alterarItens(@Valid @PathVariable UUID listaId,
+                                  @Valid @RequestBody List<ItemAlteradoDTO> itensAlterados) {
+        return listaCompraService.alterarItens(listaId, itensAlterados);
     }
 
     @PostMapping

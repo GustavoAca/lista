@@ -47,7 +47,7 @@ public class ItemOferta extends EntityAbstract {
     @Column(name = "data_final_promocao")
     private LocalDateTime dataFinalPromocao;
 
-    @OneToMany(mappedBy = "itemOferta", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "itemOferta", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemLista> registrosEmListas = new LinkedList<>();
 
     @OneToMany(mappedBy = "itemOferta", cascade = CascadeType.ALL, orphanRemoval = true)

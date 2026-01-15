@@ -5,6 +5,7 @@ import com.glaiss.core.domain.service.BaseServiceImpl;
 import com.glaiss.core.exception.RegistroNaoEncontradoException;
 import com.glaiss.core.utils.SecurityContextUtils;
 import com.glaiss.lista.controller.dto.ItemAdicionadoDTO;
+import com.glaiss.lista.controller.dto.ItemAlteradoDTO;
 import com.glaiss.lista.controller.dto.ItemListaDTO;
 import com.glaiss.lista.controller.dto.ListaCompraDTO;
 import com.glaiss.lista.domain.mapper.ListaCompraMapper;
@@ -12,6 +13,7 @@ import com.glaiss.lista.domain.model.EStatusPrecoReportado;
 import com.glaiss.lista.domain.model.ItemLista;
 import com.glaiss.lista.domain.model.ListaCompra;
 import com.glaiss.lista.domain.model.dto.PrecoReportadoPendenteDTO;
+import com.glaiss.lista.domain.model.dto.projection.ItemListaProjection;
 import com.glaiss.lista.domain.repository.ListaCompraRepository;
 import com.glaiss.lista.domain.service.itemlista.ItemListaService;
 import com.glaiss.lista.domain.service.itemoferta.ItemOfertaService;
@@ -68,27 +70,29 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
         precoReportadoPendenteService.salvarAll(precoReportadoPendenteDTOs);
     }
 
-    private BigDecimal calcularTotal(ListaCompraDTO listaCompraDTO){
+    private BigDecimal calcularTotal(ListaCompraDTO listaCompraDTO) {
         BigDecimal total;
         Map<UUID, Short> itemQuantidade = new LinkedHashMap<>();
         listaCompraDTO.itensLista().forEach(itemLista -> {
             itemQuantidade.put(itemLista.itemOfertaId(), itemLista.quantidade());
         });
         total = itemOfertaService.calcularValoresItens(itemQuantidade);
-        if(listaCompraDTO.valorTotal().equals(total)){
+        if (listaCompraDTO.valorTotal().equals(total)) {
             return listaCompraDTO.valorTotal();
         }
         return total;
     }
 
     @Override
-    public ResponsePage<ItemListaDTO> listarItensPorListaCompraIdPaginaDTO(Pageable pageable, UUID listId) {
+    public ResponsePage<ItemListaProjection> listarItensPorListaCompraIdPaginaDTO(Pageable pageable, UUID listId) {
         return itemListaService.listarItensPorListaCompraIdPaginaDTO(pageable, listId);
     }
 
     @Override
     public List<ItemListaDTO> adicionarItemLista(UUID listaId, List<ItemAdicionadoDTO> itemDTO) {
-        return itemListaService.adicionaLista(listaId, itemDTO);
+        List<ItemListaDTO> itens = itemListaService.adicionaLista(listaId, itemDTO);
+        atualizarTotaisLista(listaId);
+        return itens;
     }
 
     @Override
@@ -99,8 +103,32 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
     }
 
     @Override
-    public Boolean removerDaLista(UUID listaId, List<UUID> itensLista) {
-        return itemListaService.removerDaLista(listaId, itensLista);
+    public ListaCompraDTO buscarPorIdDto(UUID listaId) {
+        return listaCompraMapper.toDto(repo.findById(listaId).orElseThrow(() -> new RegistroNaoEncontradoException(listaId, "Lista de compra")));
+    }
+
+    private void atualizarTotaisLista(UUID listaId) {
+        ListaCompra listaCompra = repo.findById(listaId)
+                .orElseThrow(() ->
+                        new RegistroNaoEncontradoException(listaId, "Lista de compra"));
+
+        BigDecimal novoValorTotal = BigDecimal.ZERO;
+        int novoTotalItens = 0;
+
+        for (ItemLista item : listaCompra.getItensLista()) {
+            BigDecimal precoItem = item.getItemOferta().getPreco();
+            BigDecimal subtotal = precoItem.multiply(
+                    BigDecimal.valueOf(item.getQuantidade())
+            );
+
+            novoValorTotal = novoValorTotal.add(subtotal);
+            novoTotalItens++;
+        }
+
+        listaCompra.setValorTotal(novoValorTotal);
+        listaCompra.setTotalItens((short) novoTotalItens);
+
+        repo.save(listaCompra);
     }
 
     @Override
@@ -110,5 +138,14 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
             return false;
         }
         return super.deletar(listaCompra.getId());
+    }
+
+    @Override
+    public Boolean alterarItens(UUID listaId, List<ItemAlteradoDTO> itensLista) {
+        Boolean removido = itemListaService.alterarItens(listaId, itensLista);
+        if (removido) {
+            atualizarTotaisLista(listaId);
+        }
+        return removido;
     }
 }

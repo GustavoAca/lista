@@ -5,6 +5,7 @@ import com.glaiss.core.domain.service.BaseService;
 import com.glaiss.lista.domain.model.ItemOferta;
 import com.glaiss.lista.domain.model.dto.ItemOfertaDTO;
 import com.glaiss.lista.domain.model.dto.PrecoReportadoPendenteDTO;
+import com.glaiss.lista.domain.model.dto.projection.vendedor.ItemOfertaProjection;
 import org.springframework.data.domain.Pageable;
 
 import java.math.BigDecimal;
@@ -26,4 +27,6 @@ public interface ItemOfertaService extends BaseService<ItemOferta, UUID> {
     void atualizar(UUID id, ItemOfertaDTO itemOfertaDTO);
 
     ResponsePage<ItemOfertaDTO> listarPaginaPorItem(Pageable pageable, UUID itemId);
+
+    ResponsePage<ItemOfertaProjection> listarPaginaPorVendedor(Pageable pageable, UUID vendedorId);
 }

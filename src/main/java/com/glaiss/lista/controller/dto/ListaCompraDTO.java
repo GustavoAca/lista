@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public record ListaCompraDTO(UUID id,
                              UUID usuarioId,
+                             String nome,
                              BigDecimal valorTotal,
                              short totalItens,
                              List<ItemListaDTO> itensLista) {

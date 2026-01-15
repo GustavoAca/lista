@@ -22,6 +22,7 @@ public class ListaCompraMapper {
         return ListaCompra.builder()
                 .id(listaCompraDTO.id())
                 .usuarioId(listaCompraDTO.usuarioId())
+                .nome(listaCompraDTO.nome())
                 .valorTotal(listaCompraDTO.valorTotal())
                 .totalItens(listaCompraDTO.totalItens())
                 .itensLista(toItemListaEntity(listaCompraDTO.itensLista()))
@@ -38,6 +39,7 @@ public class ListaCompraMapper {
     public ListaCompraDTO toDto(ListaCompra entity) {
         return new ListaCompraDTO(entity.getId(),
                 entity.getUsuarioId(),
+                entity.getNome(),
                 entity.getValorTotal(),
                 entity.getTotalItens(),
                 (toItemListaDto(entity.getItensLista())));
