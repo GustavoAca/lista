@@ -6,12 +6,15 @@ import com.glaiss.core.exception.RegistroNaoEncontradoException;
 import com.glaiss.lista.controller.dto.ItemAdicionadoDTO;
 import com.glaiss.lista.controller.dto.ItemAlteradoDTO;
 import com.glaiss.lista.controller.dto.ItemListaDTO;
+import com.glaiss.lista.domain.exception.AdicionarItemListaException;
 import com.glaiss.lista.domain.mapper.ItemListaMapper;
 import com.glaiss.lista.domain.model.ItemLista;
 import com.glaiss.lista.domain.model.ItemOferta;
 import com.glaiss.lista.domain.model.ListaCompra;
 import com.glaiss.lista.domain.model.dto.projection.ItemListaProjection;
 import com.glaiss.lista.domain.repository.ItemListaRepository;
+import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,14 +24,18 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemListaRepository> implements ItemListaService {
 
     private final ItemListaMapper itemListaMapper;
+    private final EntityManager em;
 
     protected ItemListaServiceImpl(ItemListaRepository repo,
-                                   ItemListaMapper itemListaMapper) {
+                                   ItemListaMapper itemListaMapper,
+                                   EntityManager em) {
         super(repo);
         this.itemListaMapper = itemListaMapper;
+        this.em = em;
     }
 
     @Override
@@ -49,21 +56,21 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
                     .orElseGet(() -> criarNovoItem(listaId, itemAdicionadoDTO.itemOfertaId(), itemAdicionadoDTO.quantidade()));
             itemListas.add(itemLista);
         }
-
-        return repo.saveAll(itemListas)
-                .stream().map(itemListaMapper::toDto)
-                .toList();
+        try {
+            return repo.saveAll(itemListas)
+                    .stream().map(itemListaMapper::toDto)
+                    .toList();
+        }catch (Exception e){
+            log.error("Erro ao salvar", e);
+            throw new AdicionarItemListaException();
+        }
     }
 
     private ItemLista criarNovoItem(UUID listaId, UUID itemOfertaId, short quantidade) {
         return ItemLista.builder()
-                .itemOferta(ItemOferta.builder()
-                        .id(itemOfertaId)
-                        .build())
+                .itemOferta(em.getReference(ItemOferta.class, itemOfertaId))
                 .quantidade(quantidade)
-                .listaCompra(ListaCompra.builder()
-                        .id(listaId)
-                        .build())
+                .listaCompra(em.getReference(ListaCompra.class, listaId))
                 .build();
     }
 
