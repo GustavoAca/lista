@@ -9,15 +9,14 @@ import com.glaiss.lista.controller.dto.ItemAlteradoDTO;
 import com.glaiss.lista.controller.dto.ItemListaDTO;
 import com.glaiss.lista.controller.dto.ListaCompraDTO;
 import com.glaiss.lista.domain.mapper.ListaCompraMapper;
-import com.glaiss.lista.domain.model.EStatusPrecoReportado;
-import com.glaiss.lista.domain.model.ItemLista;
-import com.glaiss.lista.domain.model.ListaCompra;
+import com.glaiss.lista.domain.model.*;
 import com.glaiss.lista.domain.model.dto.PrecoReportadoPendenteDTO;
 import com.glaiss.lista.domain.model.dto.projection.ItemListaProjection;
 import com.glaiss.lista.domain.repository.ListaCompraRepository;
 import com.glaiss.lista.domain.service.itemlista.ItemListaService;
 import com.glaiss.lista.domain.service.itemoferta.ItemOfertaService;
 import com.glaiss.lista.domain.service.precoreportado.PrecoReportadoPendenteService;
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -33,17 +32,20 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
     private final ItemListaService itemListaService;
     private final ItemOfertaService itemOfertaService;
     private final PrecoReportadoPendenteService precoReportadoPendenteService;
+    private final EntityManager em;
 
     protected ListaCompraServiceImpl(ListaCompraRepository repo,
                                      ListaCompraMapper listaCompraMapper,
                                      ItemListaService itemListaService,
                                      ItemOfertaService itemOfertaService,
-                                     PrecoReportadoPendenteService precoReportadoPendenteService) {
+                                     PrecoReportadoPendenteService precoReportadoPendenteService,
+                                     EntityManager em) {
         super(repo);
         this.listaCompraMapper = listaCompraMapper;
         this.itemListaService = itemListaService;
         this.itemOfertaService = itemOfertaService;
         this.precoReportadoPendenteService = precoReportadoPendenteService;
+        this.em = em;
     }
 
     @Override
@@ -56,12 +58,14 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
         List<ItemLista> itemListas = listaCompra.getItensLista();
         listaCompra.setItensLista(null);
         listaCompra.setTotalItens((short) itemListas.size());
+        listaCompra.setStatusLista(em.getReference(StatusLista.class, EStatusLista.AGUARDANDO));
         listaCompra = repo.save(listaCompra);
 
         ListaCompra finalListaCompra = listaCompra;
         List<PrecoReportadoPendenteDTO> precoReportadoPendenteDTOs = new LinkedList<>();
 
         itemListas.forEach(itemLista -> {
+            itemLista.setItemOferta(em.getReference(ItemOferta.class, itemLista.getItemOfertaId()));
             itemLista.setListaCompra(finalListaCompra);
             precoReportadoPendenteDTOs.add(new PrecoReportadoPendenteDTO(null, itemLista.getItemOfertaId(), EStatusPrecoReportado.AGUARDANDO, itemOfertaService.buscarValorPorItemOfertaId(itemLista.getItemOfertaId()), null, (short) 0, Boolean.FALSE, null, null));
         });
@@ -77,7 +81,7 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
             itemQuantidade.put(itemLista.itemOfertaId(), itemLista.quantidade());
         });
         total = itemOfertaService.calcularValoresItens(itemQuantidade);
-        if (listaCompraDTO.valorTotal().equals(total)) {
+        if (listaCompraDTO.valorTotal().subtract(total).compareTo(BigDecimal.ZERO) == 0) {
             return listaCompraDTO.valorTotal();
         }
         return total;

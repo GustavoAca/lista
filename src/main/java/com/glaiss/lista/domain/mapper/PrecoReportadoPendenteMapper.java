@@ -4,10 +4,18 @@ import com.glaiss.lista.domain.model.ItemOferta;
 import com.glaiss.lista.domain.model.PrecoReportadoPendente;
 import com.glaiss.lista.domain.model.StatusPrecoReportado;
 import com.glaiss.lista.domain.model.dto.PrecoReportadoPendenteDTO;
+import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Component;
 
 @Component
 public class PrecoReportadoPendenteMapper {
+
+    private final EntityManager em;
+
+    public PrecoReportadoPendenteMapper(EntityManager em) {
+        this.em = em;
+    }
+
 
     public PrecoReportadoPendenteDTO toDto(PrecoReportadoPendente entity){
         return new PrecoReportadoPendenteDTO(entity.getId(),
@@ -25,8 +33,8 @@ public class PrecoReportadoPendenteMapper {
         return PrecoReportadoPendente.builder()
                 .id(dto.id())
                 .preco(dto.preco())
-                .itemOferta(ItemOferta.builder().id(dto.itemOferta()).build())
-                .statusPrecoReportado(StatusPrecoReportado.builder().codigo(dto.statusPrecoReportadoId()).build())
+                .itemOferta(em.getReference(ItemOferta.class,dto.itemOferta()))
+                .statusPrecoReportado(em.getReference(StatusPrecoReportado.class, dto.statusPrecoReportadoId()))
                 .mensagemErro(dto.mensagemErro())
                 .tentativas(dto.tentativas())
                 .hasPromocaoAtiva(dto.hasPromocaoAtiva())
