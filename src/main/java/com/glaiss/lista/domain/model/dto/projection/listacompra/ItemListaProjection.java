@@ -1,4 +1,4 @@
-package com.glaiss.lista.domain.model.dto.projection;
+package com.glaiss.lista.domain.model.dto.projection.listacompra;
 
 import java.util.UUID;
 
@@ -10,4 +10,6 @@ public interface ItemListaProjection {
     ItemOfertaProjection getItemOferta();
 
     short getQuantidade();
+
+    long getVersion();
 }

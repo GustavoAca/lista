@@ -1,9 +1,10 @@
 package com.glaiss.lista.domain.mapper;
 
+import com.glaiss.lista.controller.itemoferta.dto.ItemOfertaDTO;
+import com.glaiss.lista.controller.listacompra.dto.ItemOfertaConcluirRequest;
 import com.glaiss.lista.domain.model.Item;
 import com.glaiss.lista.domain.model.ItemOferta;
 import com.glaiss.lista.domain.model.Vendedor;
-import com.glaiss.lista.domain.model.dto.ItemOfertaDTO;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -16,7 +17,8 @@ public class ItemOfertaMapper {
                 itemOferta.getHasPromocaoAtiva(),
                 itemOferta.getPreco(),
                 itemOferta.getDataInicioPromocao(),
-                itemOferta.getDataFinalPromocao());
+                itemOferta.getDataFinalPromocao(),
+                itemOferta.getVersion());
     }
 
     public ItemOferta toEntity(ItemOfertaDTO itemOfertaDTO){
@@ -28,6 +30,20 @@ public class ItemOfertaMapper {
                 .vendedor(Vendedor.builder().id(itemOfertaDTO.vendedorId()).build())
                 .dataInicioPromocao(itemOfertaDTO.dataInicioPromocao())
                 .dataFinalPromocao(itemOfertaDTO.dataFinalPromocao())
+                .version(itemOfertaDTO.version())
+                .build();
+    }
+
+    public ItemOferta itemOfertaConcluirRequestToEntity(ItemOfertaConcluirRequest itemOfertaConcluirRequest) {
+        return ItemOferta.builder()
+                .id(itemOfertaConcluirRequest.id())
+                .hasPromocaoAtiva(itemOfertaConcluirRequest.hasPromocaoAtiva())
+                .preco(itemOfertaConcluirRequest.preco())
+                .item(Item.builder().id(itemOfertaConcluirRequest.itemId()).build())
+                .vendedor(Vendedor.builder().id(itemOfertaConcluirRequest.vendedorId()).build())
+                .dataInicioPromocao(itemOfertaConcluirRequest.dataInicioPromocao())
+                .dataFinalPromocao(itemOfertaConcluirRequest.dataFinalPromocao())
+                .version(itemOfertaConcluirRequest.version())
                 .build();
     }
 }

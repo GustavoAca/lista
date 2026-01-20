@@ -3,15 +3,15 @@ package com.glaiss.lista.domain.service.itemlista;
 import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.core.domain.service.BaseServiceImpl;
 import com.glaiss.core.exception.RegistroNaoEncontradoException;
-import com.glaiss.lista.controller.dto.ItemAdicionadoDTO;
-import com.glaiss.lista.controller.dto.ItemAlteradoDTO;
-import com.glaiss.lista.controller.dto.ItemListaDTO;
+import com.glaiss.lista.controller.listacompra.dto.ItemAdicionadoRequest;
+import com.glaiss.lista.controller.listacompra.dto.ItemAlteradoRequest;
+import com.glaiss.lista.controller.listacompra.dto.ItemListaRequest;
 import com.glaiss.lista.domain.exception.AdicionarItemListaException;
 import com.glaiss.lista.domain.mapper.ItemListaMapper;
 import com.glaiss.lista.domain.model.ItemLista;
 import com.glaiss.lista.domain.model.ItemOferta;
 import com.glaiss.lista.domain.model.ListaCompra;
-import com.glaiss.lista.domain.model.dto.projection.ItemListaProjection;
+import com.glaiss.lista.domain.model.dto.projection.listacompra.ItemListaProjection;
 import com.glaiss.lista.domain.repository.ItemListaRepository;
 import jakarta.persistence.EntityManager;
 import lombok.extern.slf4j.Slf4j;
@@ -45,15 +45,15 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
     }
 
     @Override
-    public List<ItemListaDTO> adicionaLista(UUID listaId, List<ItemAdicionadoDTO> itensDto) {
+    public List<ItemListaRequest> adicionaLista(UUID listaId, List<ItemAdicionadoRequest> itensDto) {
         List<ItemLista> itemListas = new LinkedList<>();
-        for (ItemAdicionadoDTO itemAdicionadoDTO : itensDto) {
-            ItemLista itemLista = repo.findByListaCompra_IdAndItemOferta_Id(listaId, itemAdicionadoDTO.itemOfertaId())
+        for (ItemAdicionadoRequest itemAdicionadoRequest : itensDto) {
+            ItemLista itemLista = repo.findByListaCompra_IdAndItemOferta_Id(listaId, itemAdicionadoRequest.itemOfertaId())
                     .map(existente -> {
-                        existente.adicionarQuantidade(itemAdicionadoDTO.quantidade());
+                        existente.adicionarQuantidade(itemAdicionadoRequest.quantidade());
                         return existente;
                     })
-                    .orElseGet(() -> criarNovoItem(listaId, itemAdicionadoDTO.itemOfertaId(), itemAdicionadoDTO.quantidade()));
+                    .orElseGet(() -> criarNovoItem(listaId, itemAdicionadoRequest.itemOfertaId(), itemAdicionadoRequest.quantidade()));
             itemListas.add(itemLista);
         }
         try {
@@ -85,10 +85,10 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
     }
 
     @Override
-    public Boolean alterarItens(UUID listaId, List<ItemAlteradoDTO> itensAlterados) {
+    public Boolean alterarItens(UUID listaId, List<ItemAlteradoRequest> itensAlterados) {
         try {
             List<ItemLista> itensLista = new LinkedList<>();
-            for (ItemAlteradoDTO itemAlterado : itensAlterados) {
+            for (ItemAlteradoRequest itemAlterado : itensAlterados) {
                 ItemLista itemLista = repo
                         .findById(itemAlterado.id())
                         .map(existente -> {
@@ -108,5 +108,13 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
         } catch (Exception e) {
             return Boolean.FALSE;
         }
+    }
+
+    @Override
+    public void salvarAllConcluindoLista(List<ItemLista> itensLista) {
+        itensLista.forEach(itemLista -> {
+            itemLista.setPrecoUnitario(itemLista.getItemOferta().getPreco());
+            repo.save(itemLista);
+        });
     }
 }

@@ -1,8 +1,8 @@
-package com.glaiss.lista.controller;
+package com.glaiss.lista.controller.itemoferta;
 
 
 import com.glaiss.core.domain.model.ResponsePage;
-import com.glaiss.lista.domain.model.dto.ItemOfertaDTO;
+import com.glaiss.lista.controller.itemoferta.dto.ItemOfertaDTO;
 import com.glaiss.lista.domain.model.dto.projection.vendedor.ItemOfertaProjection;
 import com.glaiss.lista.domain.service.itemoferta.ItemOfertaService;
 import jakarta.validation.Valid;

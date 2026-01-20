@@ -1,8 +1,8 @@
-package com.glaiss.lista.controller;
+package com.glaiss.lista.controller.vendedor;
 
 import com.glaiss.core.domain.model.ResponsePage;
-import com.glaiss.lista.controller.dto.NovoEnderecoVendedorDTO;
-import com.glaiss.lista.controller.dto.VendedorDTO;
+import com.glaiss.lista.controller.vendedor.dto.NovoEnderecoVendedorDTO;
+import com.glaiss.lista.controller.vendedor.dto.VendedorDTO;
 import com.glaiss.lista.domain.service.vendedor.VendedorService;
 import jakarta.validation.Valid;
 import org.springframework.cache.annotation.Cacheable;

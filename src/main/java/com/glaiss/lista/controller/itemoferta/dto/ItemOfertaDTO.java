@@ -1,4 +1,4 @@
-package com.glaiss.lista.domain.model.dto;
+package com.glaiss.lista.controller.itemoferta.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import jakarta.validation.constraints.NotNull;
@@ -13,5 +13,6 @@ public record ItemOfertaDTO(UUID id,
                             Boolean hasPromocaoAtiva,
                             @NotNull BigDecimal preco,
                             @JsonInclude(JsonInclude.Include.NON_NULL) LocalDateTime dataInicioPromocao,
-                            @JsonInclude(JsonInclude.Include.NON_NULL) LocalDateTime dataFinalPromocao) {
+                            @JsonInclude(JsonInclude.Include.NON_NULL) LocalDateTime dataFinalPromocao,
+                            long version) {
 }

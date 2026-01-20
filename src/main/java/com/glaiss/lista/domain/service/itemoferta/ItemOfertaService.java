@@ -2,8 +2,8 @@ package com.glaiss.lista.domain.service.itemoferta;
 
 import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.core.domain.service.BaseService;
+import com.glaiss.lista.controller.itemoferta.dto.ItemOfertaDTO;
 import com.glaiss.lista.domain.model.ItemOferta;
-import com.glaiss.lista.domain.model.dto.ItemOfertaDTO;
 import com.glaiss.lista.domain.model.dto.PrecoReportadoPendenteDTO;
 import com.glaiss.lista.domain.model.dto.projection.vendedor.ItemOfertaProjection;
 import org.springframework.data.domain.Pageable;

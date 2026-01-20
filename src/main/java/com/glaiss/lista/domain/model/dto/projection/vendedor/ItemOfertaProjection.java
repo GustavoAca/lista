@@ -1,6 +1,6 @@
 package com.glaiss.lista.domain.model.dto.projection.vendedor;
 
-import com.glaiss.lista.domain.model.dto.projection.ItemProjection;
+import com.glaiss.lista.domain.model.dto.projection.listacompra.ItemProjection;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -19,4 +19,6 @@ public interface ItemOfertaProjection {
     LocalDateTime getDataInicioPromocao();
 
     LocalDateTime getDataFinalPromocao();
+
+    long getVersion();
 }

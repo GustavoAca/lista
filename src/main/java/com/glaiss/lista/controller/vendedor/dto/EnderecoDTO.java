@@ -1,4 +1,4 @@
-package com.glaiss.lista.controller.dto;
+package com.glaiss.lista.controller.vendedor.dto;
 
 import jakarta.validation.constraints.NotNull;
 
@@ -12,5 +12,6 @@ public record EnderecoDTO(@NotNull String complemento,
                           @NotNull String numero,
                           @NotNull String estado,
                           UUID id,
-                          UUID vendedorId) {
+                          UUID vendedorId,
+                          long version) {
 }

@@ -1,6 +1,6 @@
 package com.glaiss.lista.domain.mapper;
 
-import com.glaiss.lista.controller.dto.ItemDTO;
+import com.glaiss.lista.controller.item.dto.ItemDTO;
 import com.glaiss.lista.domain.model.Item;
 import org.springframework.stereotype.Component;
 
@@ -11,7 +11,8 @@ public class ItemMapper {
         return new ItemDTO(item.getId(),
                 item.getIsAtivo(),
                 item.getNome(),
-                item.getDescricao());
+                item.getDescricao(),
+                item.getVersion());
     }
 
     public Item toEntity(ItemDTO itemDTO){
@@ -20,6 +21,7 @@ public class ItemMapper {
                 .descricao(itemDTO.descricao())
                 .nome(itemDTO.nome())
                 .isAtivo(itemDTO.isAtivo())
+                .version(itemDTO.version())
                 .build();
     }
 }

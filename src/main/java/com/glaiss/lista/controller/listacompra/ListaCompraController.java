@@ -1,11 +1,8 @@
-package com.glaiss.lista.controller;
+package com.glaiss.lista.controller.listacompra;
 
 import com.glaiss.core.domain.model.ResponsePage;
-import com.glaiss.lista.controller.dto.ItemAdicionadoDTO;
-import com.glaiss.lista.controller.dto.ItemAlteradoDTO;
-import com.glaiss.lista.controller.dto.ItemListaDTO;
-import com.glaiss.lista.controller.dto.ListaCompraDTO;
-import com.glaiss.lista.domain.model.dto.projection.ItemListaProjection;
+import com.glaiss.lista.controller.listacompra.dto.*;
+import com.glaiss.lista.domain.model.dto.projection.listacompra.ItemListaProjection;
 import com.glaiss.lista.domain.service.listacompra.ListaCompraService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.Pageable;
@@ -33,30 +30,35 @@ public class ListaCompraController {
     }
 
     @GetMapping("/{listaId}")
-    public ListaCompraDTO listarPorId(@PathVariable UUID listaId) {
+    public ListaCompraRequest listarPorId(@PathVariable UUID listaId) {
         return listaCompraService.buscarPorIdDto(listaId);
     }
 
     @GetMapping
-    public ResponsePage<ListaCompraDTO> listar(@PageableDefault(size = 20) Pageable pageable) {
+    public ResponsePage<ListaCompraRequest> listar(@PageableDefault(size = 20) Pageable pageable) {
         return listaCompraService.listar(pageable);
     }
 
     @PostMapping("/{listaId}/adicionar-itens")
-    public List<ItemListaDTO> adicionarNaLista(@Valid @PathVariable UUID listaId,
-                                               @Valid @RequestBody List<ItemAdicionadoDTO> itemDTO) {
+    public List<ItemListaRequest> adicionarNaLista(@Valid @PathVariable UUID listaId,
+                                                   @Valid @RequestBody List<ItemAdicionadoRequest> itemDTO) {
         return listaCompraService.adicionarItemLista(listaId, itemDTO);
     }
 
     @PutMapping("/{listaId}/alterar-itens")
     public Boolean alterarItens(@Valid @PathVariable UUID listaId,
-                                  @Valid @RequestBody List<ItemAlteradoDTO> itensAlterados) {
+                                  @Valid @RequestBody List<ItemAlteradoRequest> itensAlterados) {
         return listaCompraService.alterarItens(listaId, itensAlterados);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public void criarLista(@Valid @RequestBody ListaCompraDTO listaCompraDTO) {
-        listaCompraService.criarLista(listaCompraDTO);
+    public void criarLista(@Valid @RequestBody ListaCompraRequest listaCompraRequest) {
+        listaCompraService.criarLista(listaCompraRequest);
+    }
+
+    @PutMapping("/concluir")
+    public void concluirLista(@Valid @RequestBody ConcluirListaRequestDTO concluirListaRequestDTO) {
+        listaCompraService.concluirLista(concluirListaRequestDTO);
     }
 }

@@ -1,8 +1,8 @@
-package com.glaiss.lista.controller;
+package com.glaiss.lista.controller.item;
 
 
 import com.glaiss.core.domain.model.ResponsePage;
-import com.glaiss.lista.controller.dto.ItemDTO;
+import com.glaiss.lista.controller.item.dto.ItemDTO;
 import com.glaiss.lista.domain.service.item.ItemService;
 import jakarta.validation.Valid;
 import org.springframework.cache.annotation.CacheEvict;

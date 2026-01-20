@@ -3,9 +3,9 @@ package com.glaiss.lista.domain.service.vendedor;
 import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.core.domain.service.BaseServiceImpl;
 import com.glaiss.core.exception.RegistroNaoEncontradoException;
-import com.glaiss.lista.controller.dto.EnderecoDTO;
-import com.glaiss.lista.controller.dto.NovoEnderecoVendedorDTO;
-import com.glaiss.lista.controller.dto.VendedorDTO;
+import com.glaiss.lista.controller.vendedor.dto.EnderecoDTO;
+import com.glaiss.lista.controller.vendedor.dto.NovoEnderecoVendedorDTO;
+import com.glaiss.lista.controller.vendedor.dto.VendedorDTO;
 import com.glaiss.lista.domain.mapper.VendedorMapper;
 import com.glaiss.lista.domain.model.Vendedor;
 import com.glaiss.lista.domain.repository.VendedorRepository;
@@ -59,7 +59,8 @@ public class VendedorServiceImpl extends BaseServiceImpl<Vendedor, UUID, Vendedo
                     endereco.numero(),
                     endereco.estado(),
                     null,
-                    finalVendedor.getId());
+                    finalVendedor.getId(),
+                    endereco.version());
             enderecoService.salvar(enderecoDTO);
         });
         return vendedorMapper.toDto(vendedor);
@@ -79,7 +80,8 @@ public class VendedorServiceImpl extends BaseServiceImpl<Vendedor, UUID, Vendedo
                     endereco.numero(),
                     endereco.estado(),
                     null,
-                    novoEnderecoVendedorDTO.vendedorId());
+                    novoEnderecoVendedorDTO.vendedorId(),
+                    endereco.version());
             enderecoService.salvar(enderecoDTO);
         });
         return Boolean.TRUE;

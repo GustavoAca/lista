@@ -1,6 +1,6 @@
 package com.glaiss.lista.domain.mapper;
 
-import com.glaiss.lista.controller.dto.EnderecoDTO;
+import com.glaiss.lista.controller.vendedor.dto.EnderecoDTO;
 import com.glaiss.lista.domain.model.Endereco;
 import com.glaiss.lista.domain.model.Vendedor;
 import org.springframework.stereotype.Component;
@@ -24,6 +24,7 @@ public class EnderecoMapper {
                 .numero(dto.numero())
                 .estado(dto.estado())
                 .vendedor(Vendedor.builder().id(vendedorId).build())
+                .version(dto.version())
                 .build();
     }
 
@@ -39,7 +40,8 @@ public class EnderecoMapper {
                 entity.getNumero(),
                 entity.getEstado(),
                 enderecoId,
-                vendedorId
+                vendedorId,
+                entity.getVersion()
         );
     }
 }

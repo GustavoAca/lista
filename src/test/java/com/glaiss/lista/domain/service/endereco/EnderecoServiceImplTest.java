@@ -1,7 +1,7 @@
 package com.glaiss.lista.domain.service.endereco;
 
 import com.glaiss.lista.ListaApplicationTests;
-import com.glaiss.lista.controller.dto.EnderecoDTO;
+import com.glaiss.lista.controller.vendedor.dto.EnderecoDTO;
 import com.glaiss.lista.domain.mapper.EnderecoMapper;
 import com.glaiss.lista.domain.model.Endereco;
 import com.glaiss.lista.domain.repository.EnderecoRepository;
@@ -32,10 +32,10 @@ public class EnderecoServiceImplTest extends ListaApplicationTests {
 
     @Test
     void salvar_deveRetornarDto_quandoSalvarComSucesso() {
-        EnderecoDTO inputDto = new EnderecoDTO("complemento","0999999","rua","bairro","cidade","1", "SP", null, null);
+        EnderecoDTO inputDto = new EnderecoDTO("complemento","0999999","rua","bairro","cidade","1", "SP", null, null, 0);
         Endereco entity = new Endereco();
         Endereco savedEntity = new Endereco();
-        EnderecoDTO expectedDto = new EnderecoDTO("complemento","0999999","rua","bairro","cidade","1", "SP", null, null);
+        EnderecoDTO expectedDto = new EnderecoDTO("complemento","0999999","rua","bairro","cidade","1", "SP", null, null, 0);
 
         when(enderecoMapper.toEntity(inputDto)).thenReturn(entity);
         when(repo.save(entity)).thenReturn(savedEntity);
@@ -51,7 +51,7 @@ public class EnderecoServiceImplTest extends ListaApplicationTests {
 
     @Test
     void salvar_devePropagarExcecao_quandoMapperFalhar() {
-        EnderecoDTO inputDto = new EnderecoDTO("complemento","0999999","rua","bairro","cidade","1", "SP", null, null);
+        EnderecoDTO inputDto = new EnderecoDTO("complemento","0999999","rua","bairro","cidade","1", "SP", null, null, 0);
 
         when(enderecoMapper.toEntity(inputDto)).thenThrow(new IllegalArgumentException("map error"));
 
@@ -62,7 +62,7 @@ public class EnderecoServiceImplTest extends ListaApplicationTests {
 
     @Test
     void salvar_devePropagarExcecao_quandoRepositorioFalhar() {
-        EnderecoDTO inputDto = new EnderecoDTO("complemento","0999999","rua","bairro","cidade","1", "SP", null, null);
+        EnderecoDTO inputDto = new EnderecoDTO("complemento","0999999","rua","bairro","cidade","1", "SP", null, null, 0);
         Endereco entity = new Endereco();
 
         when(enderecoMapper.toEntity(inputDto)).thenReturn(entity);

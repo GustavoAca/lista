@@ -2,7 +2,7 @@ package com.glaiss.lista.domain.service.item;
 
 import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.core.domain.service.BaseService;
-import com.glaiss.lista.controller.dto.ItemDTO;
+import com.glaiss.lista.controller.item.dto.ItemDTO;
 import com.glaiss.lista.domain.model.Item;
 import org.springframework.data.domain.Pageable;
 

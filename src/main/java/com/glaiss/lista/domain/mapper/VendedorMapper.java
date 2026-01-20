@@ -1,7 +1,7 @@
 package com.glaiss.lista.domain.mapper;
 
-import com.glaiss.lista.controller.dto.EnderecoDTO;
-import com.glaiss.lista.controller.dto.VendedorDTO;
+import com.glaiss.lista.controller.vendedor.dto.EnderecoDTO;
+import com.glaiss.lista.controller.vendedor.dto.VendedorDTO;
 import com.glaiss.lista.domain.model.Endereco;
 import com.glaiss.lista.domain.model.Vendedor;
 import org.springframework.stereotype.Component;
@@ -33,7 +33,8 @@ public class VendedorMapper {
         return new VendedorDTO(
                 id,
                 entity.getNome(),
-                toEnderecosDto(entity.getEnderecos()));
+                toEnderecosDto(entity.getEnderecos()),
+                entity.getVersion());
     }
 
     private List<Endereco> toEnderecosEntity(List<EnderecoDTO> endereco) {

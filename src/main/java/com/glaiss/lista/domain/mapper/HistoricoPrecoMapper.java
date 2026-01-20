@@ -12,7 +12,8 @@ public class HistoricoPrecoMapper {
         return new HistoricoPrecoDTO(historicoPreco.getId(),
                 historicoPreco.getItemOfertaId(),
                 historicoPreco.getPreco(),
-                historicoPreco.getHasPromocaoAtiva());
+                historicoPreco.getHasPromocaoAtiva(),
+                historicoPreco.getVersion());
     }
 
     public HistoricoPreco toEntity(HistoricoPrecoDTO dto){
@@ -21,6 +22,7 @@ public class HistoricoPrecoMapper {
                 .itemOferta(ItemOferta.builder().id(dto.itemOfertaId()).build())
                 .preco(dto.preco())
                 .hasPromocaoAtiva(dto.hasPromocaoAtiva())
+                .version(dto.version())
                 .build();
     }
 }

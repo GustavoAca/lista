@@ -3,10 +3,10 @@ package com.glaiss.lista.domain.service.itemoferta;
 import com.glaiss.core.domain.model.ResponsePage;
 import com.glaiss.core.domain.service.BaseServiceImpl;
 import com.glaiss.core.exception.RegistroNaoEncontradoException;
+import com.glaiss.lista.controller.itemoferta.dto.ItemOfertaDTO;
 import com.glaiss.lista.domain.mapper.ItemOfertaMapper;
 import com.glaiss.lista.domain.model.ItemOferta;
 import com.glaiss.lista.domain.model.dto.HistoricoPrecoDTO;
-import com.glaiss.lista.domain.model.dto.ItemOfertaDTO;
 import com.glaiss.lista.domain.model.dto.PrecoReportadoPendenteDTO;
 import com.glaiss.lista.domain.model.dto.projection.vendedor.ItemOfertaProjection;
 import com.glaiss.lista.domain.repository.ItemOfertaRepository;
@@ -87,7 +87,7 @@ public class ItemOfertaServiceImpl extends BaseServiceImpl<ItemOferta, UUID, Ite
                 itemOferta.setDataInicioPromocao(precoReportadoPendenteDTO.dataInicioPromocao());
                 itemOferta.setDataFinalPromocao(precoReportadoPendenteDTO.dataFinalPromocao());
             }
-            historicoPrecoService.salvar(new HistoricoPrecoDTO(null, itemOferta.getId(), itemOferta.getPreco(), itemOferta.getHasPromocaoAtiva()));
+            historicoPrecoService.salvar(new HistoricoPrecoDTO(null, itemOferta.getId(), itemOferta.getPreco(), itemOferta.getHasPromocaoAtiva(), 0));
             salvar(itemOferta);
             return Boolean.TRUE;
         } catch (Exception e) {

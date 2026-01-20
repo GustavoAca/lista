@@ -10,4 +10,6 @@ public interface ItemProjection {
     String getNome();
 
     String getDescricao();
+
+    long getVersion();
 }

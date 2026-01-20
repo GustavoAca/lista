@@ -6,5 +6,6 @@ import java.util.UUID;
 public record HistoricoPrecoDTO(UUID id,
                                 UUID itemOfertaId,
                                 BigDecimal preco,
-                                Boolean hasPromocaoAtiva) {
+                                Boolean hasPromocaoAtiva,
+                                long version) {
 }

@@ -1,6 +1,7 @@
 package com.glaiss.lista.domain.model;
 
 import com.glaiss.core.domain.model.EntityAbstract;
+import com.glaiss.core.utils.anotacao.ValorBigDecimal;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -8,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -23,6 +25,10 @@ public class ItemLista extends EntityAbstract {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
+
+    @Column(name = "preco_unitario", nullable = true)
+    @ValorBigDecimal
+    private BigDecimal precoUnitario;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "listas_compra_id", nullable = false)

@@ -2,7 +2,7 @@ package com.glaiss.lista.domain.repository;
 
 import com.glaiss.core.domain.repository.BaseRepository;
 import com.glaiss.lista.domain.model.ItemLista;
-import com.glaiss.lista.domain.model.dto.projection.ItemListaProjection;
+import com.glaiss.lista.domain.model.dto.projection.listacompra.ItemListaProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Modifying;
