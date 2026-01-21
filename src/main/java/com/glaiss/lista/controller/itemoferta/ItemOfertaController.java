@@ -6,7 +6,6 @@ import com.glaiss.lista.controller.itemoferta.dto.ItemOfertaDTO;
 import com.glaiss.lista.domain.model.dto.projection.vendedor.ItemOfertaProjection;
 import com.glaiss.lista.domain.service.itemoferta.ItemOfertaService;
 import jakarta.validation.Valid;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -25,7 +24,6 @@ public class ItemOfertaController {
     }
 
     @GetMapping
-    @Cacheable(value = "ItemOferta", key = "#pageable.pageNumber")
     public ResponsePage<ItemOfertaDTO> listar(@PageableDefault(size = 20) Pageable pageable){
         return itemOfertaService.listarPaginaDTO(pageable);
     }
@@ -37,7 +35,6 @@ public class ItemOfertaController {
     }
 
     @GetMapping("/{itemId}")
-    @Cacheable(value = "ItemOferta", key = "#itemId + ':' + #pageable.pageNumber")
     public ResponsePage<ItemOfertaDTO> listarPorItem(@PageableDefault(size = 20) Pageable pageable,
                                                      @PathVariable UUID itemId){
         return itemOfertaService.listarPaginaPorItem(pageable, itemId);
