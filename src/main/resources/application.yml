@@ -2,18 +2,10 @@ spring:
   application:
     name: lista
     version: @project.version@
-  cloud:
-    discovery:
-      enabled: ${DISCOVERY_ENABLED:false}
-      eureka:
-        instance:
-          hostname: localhost
-    client:
-      hostname: localhost
-    loadbalancer:
-      enabled: ${LOADBALANCER_ENABLED:false}
-      ribbon:
-        enabled: false
+
+  # ==============================================================
+  # CORE CONFIGURATIONS (JPA, Jackson, Security, Flyway)
+  # ==============================================================
   jackson:
     time-zone: America/Sao_Paulo
   jpa:
@@ -24,42 +16,48 @@ spring:
           time_zone: America/Sao_Paulo
   security:
     enabled: true
+  flyway:
+    locations: classpath:db/migration
+    table: FLYWAY_SCHEMA_HISTORY
+    schemas: gl_lista
+    # Defaults for local/dev
+    user: gl_lista
+    password: gl_lista
+
+  # ==============================================================
+  # FEATURE FLAGS & INTEGRATIONS (Default: Standalone/Disabled)
+  # ==============================================================
+  cloud:
+    discovery:
+      enabled: ${DISCOVERY_ENABLED:false}
+    loadbalancer:
+      enabled: ${LOADBALANCER_ENABLED:false}
+      ribbon:
+        enabled: false
+  
   feign:
     client:
       enabled: ${FEIGN_ENABLED:false}
-  eureka:
-    enabled: ${EUREKA_ENABLED:false}
-  discovery:
-    client:
-      enabled: ${DISCOVERY_ENABLED:false}
+  
   cache:
     type: ${CACHE_TYPE:simple}
     redis:
       time-to-live: 3600s
+  
   redis:
     enabled: ${REDIS_ENABLED:false}
-    host: redis
-    port: 6379
-    ssl:
-      enabled: false
+    host: ${REDIS_HOST:redis}
+    port: ${REDIS_PORT:6379}
     timeout: 5000
     jedis:
       pool:
         max-idle: 10
         min-idle: 1
         max-total: 20
-  flyway:
-    user: gl_lista
-    password: gl_lista
-    locations: classpath:db/migration
-    table: FLYWAY_SCHEMA_HISTORY
-    schemas: gl_lista
 
-server:
-  port: 8193
-  servlet:
-    context-path: /lista
-
+# ==============================================================
+# EUREKA CLIENT CONFIGURATION
+# ==============================================================
 eureka:
   client:
     enabled: ${EUREKA_CLIENT_ENABLED:false}
@@ -67,13 +65,24 @@ eureka:
       defaultZone: ${URL_DISCOVERY:http://localhost:8761/discovery/eureka}
     fetch-registry: true
     register-with-eureka: true
+  instance:
+    hostname: ${EUREKA_INSTANCE_HOSTNAME:localhost}
+    prefer-ip-address: false
+    instance-id: ${spring.application.name}:${server.port}
+
+# ==============================================================
+# SERVER & MANAGEMENT
+# ==============================================================
+server:
+  port: ${PORT:8193}
+  servlet:
+    context-path: /lista
 
 management:
   endpoints:
     web:
       exposure:
         include: "*"
-
   tracing:
     enabled: true
     exporter:
@@ -81,6 +90,26 @@ management:
         enabled: true
         url: http://localhost:9411/api/v2/spans
 
+# ==============================================================
+# LOGGING & LOGSTASH
+# ==============================================================
+logstash:
+  destination: ${LOGSTASH_HOST:localhost}:${LOGSTASH_PORT:5000}
+
+logging:
+  level:
+    root: WARN
+    org.springframework: WARN
+    org.springframework.web: WARN
+    org.springframework.boot: WARN
+    org.springframework.security: WARN
+    org.hibernate: WARN
+    org.hibernate.SQL: OFF
+    com.glaiss: INFO
+
+# ==============================================================
+# SECURITY KEYS (JWT)
+# ==============================================================
 jwt:
   public:
     key: |
@@ -94,33 +123,12 @@ jwt:
       ewIDAQAB
       -----END PUBLIC KEY-----
 
-logstash:
-  destination: localhost:5000
-
-logging:
-  level:
-    root: WARN
-
-    # Spring
-    org.springframework: WARN
-    org.springframework.web: WARN
-    org.springframework.boot: WARN
-    org.springframework.security: WARN
-
-    # Hibernate / JPA
-    org.hibernate: WARN
-    org.hibernate.SQL: OFF
-    org.hibernate.type.descriptor.sql: OFF
-
-    # Infra
-    org.apache: WARN
-    reactor.netty: WARN
-
-    com.glaiss: INFO
-
-servico-externos-permitidos: localhost:4200,localhost:4201
+servico-externos-permitidos: ${SERVICOS_EXTERNOS_PERMITIDOS:http://localhost:4200,http://localhost:4201}
 
 ---
+# ==============================================================
+# PROFILE: DEV
+# ==============================================================
 spring:
   config:
     activate:
@@ -132,6 +140,9 @@ spring:
     driver-class-name: org.postgresql.Driver
 
 ---
+# ==============================================================
+# PROFILE: PROD
+# ==============================================================
 spring:
   config:
     activate:
@@ -144,35 +155,3 @@ spring:
   flyway:
     user: ${USER_DB}
     password: ${PASSWORD_DB}
-  data:
-    redis:
-      host: ${REDIS_HOST}
-      port: ${REDIS_PORT}
-      ssl:
-        enabled: false
-      timeout: 5000
-      jedis:
-        pool:
-          max-idle: 10
-          min-idle: 1
-          max-total: 20
-  cloud:
-    discovery:
-      eureka:
-        instance:
-          hostname: ${EUREKA_INSTANCE_HOSTNAME}
-    client:
-      hostname: ${EUREKA_INSTANCE_HOSTNAME}
-eureka:
-  client:
-    service-url:
-      defaultZone: ${URL_DISCOVERY}
-  instance:
-    hostname: ${EUREKA_INSTANCE_HOSTNAME}
-    non-secure-port: ${EUREKA_INSTANCE_NON_SECURE_PORT}
-    prefer-ip-address: false
-    instance-id: ${spring.application.name}:${server.port}
-server:
-  port: ${PORT}
-logstash:
-  destination: ${LOGSTASH}
