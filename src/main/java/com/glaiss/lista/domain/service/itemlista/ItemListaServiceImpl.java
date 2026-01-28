@@ -18,6 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -45,33 +46,36 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
     }
 
     @Override
+    @Transactional
     public List<ItemListaRequest> adicionaLista(UUID listaId, List<ItemAdicionadoRequest> itensDto) {
         List<ItemLista> itemListas = new LinkedList<>();
+        
+        ListaCompra listaCompraRef = em.getReference(ListaCompra.class, listaId);
+
         for (ItemAdicionadoRequest itemAdicionadoRequest : itensDto) {
             ItemLista itemLista = repo.findByListaCompra_IdAndItemOferta_Id(listaId, itemAdicionadoRequest.itemOfertaId())
                     .map(existente -> {
                         existente.adicionarQuantidade(itemAdicionadoRequest.quantidade());
                         return existente;
                     })
-                    .orElseGet(() -> criarNovoItem(listaId, itemAdicionadoRequest.itemOfertaId(), itemAdicionadoRequest.quantidade()));
+                    .orElseGet(() -> {
+                        ItemOferta itemOfertaRef = em.getReference(ItemOferta.class, itemAdicionadoRequest.itemOfertaId());
+                        return ItemLista.builder()
+                                .listaCompra(listaCompraRef)
+                                .itemOferta(itemOfertaRef)
+                                .quantidade(itemAdicionadoRequest.quantidade())
+                                .build();
+                    });
             itemListas.add(itemLista);
         }
         try {
-            return repo.saveAll(itemListas)
-                    .stream().map(itemListaMapper::toDto)
+            return repo.saveAll(itemListas).stream()
+                    .map(itemListaMapper::toDto)
                     .toList();
         }catch (Exception e){
-            log.error("Erro ao salvar", e);
+            log.error("Erro ao salvar itens na lista {}", listaId, e);
             throw new AdicionarItemListaException();
         }
-    }
-
-    private ItemLista criarNovoItem(UUID listaId, UUID itemOfertaId, short quantidade) {
-        return ItemLista.builder()
-                .itemOferta(em.getReference(ItemOferta.class, itemOfertaId))
-                .quantidade(quantidade)
-                .listaCompra(em.getReference(ListaCompra.class, listaId))
-                .build();
     }
 
     @Override

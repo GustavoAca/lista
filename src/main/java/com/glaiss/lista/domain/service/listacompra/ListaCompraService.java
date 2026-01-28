@@ -25,4 +25,6 @@ public interface ListaCompraService extends BaseService<ListaCompra, UUID> {
     Boolean alterarItens(@Valid UUID listaId, @Valid List<ItemAlteradoRequest> itensLista);
 
     void concluirLista(@Valid ConcluirListaRequestDTO concluirListaRequestDTO);
+
+    ListaCompraRequest atualizar(ListaCompraEdicaoRequest listaCompraEdicaoRequest);
 }

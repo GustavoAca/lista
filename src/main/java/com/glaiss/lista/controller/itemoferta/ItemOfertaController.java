@@ -24,25 +24,32 @@ public class ItemOfertaController {
     }
 
     @GetMapping
-    public ResponsePage<ItemOfertaDTO> listar(@PageableDefault(size = 20) Pageable pageable){
+    public ResponsePage<ItemOfertaDTO> listar(@PageableDefault(size = 20) Pageable pageable) {
         return itemOfertaService.listarPaginaDTO(pageable);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ItemOfertaDTO criar(@Valid @RequestBody ItemOfertaDTO itemOfertaDTO){
+    public ItemOfertaDTO criar(@Valid @RequestBody ItemOfertaDTO itemOfertaDTO) {
         return itemOfertaService.salvar(itemOfertaDTO);
     }
 
     @GetMapping("/{itemId}")
     public ResponsePage<ItemOfertaDTO> listarPorItem(@PageableDefault(size = 20) Pageable pageable,
-                                                     @PathVariable UUID itemId){
+                                                     @PathVariable UUID itemId) {
         return itemOfertaService.listarPaginaPorItem(pageable, itemId);
+    }
+
+    @GetMapping("/buscar-por-vendedor-e-nome-item")
+    public ResponsePage<ItemOfertaProjection> listarPorItemNome(@PageableDefault(size = 20) Pageable pageable,
+                                                                @RequestParam String itemNome,
+                                                                @RequestParam UUID vendedorId) {
+        return itemOfertaService.listarPaginaPorItemNomeEVendedor(pageable, itemNome, vendedorId);
     }
 
     @GetMapping("/vendedor/{vendedorId}")
     public ResponsePage<ItemOfertaProjection> listarPorVendedorId(@PageableDefault(size = 20) Pageable pageable,
-                                                                  @PathVariable UUID vendedorId){
+                                                                  @PathVariable UUID vendedorId) {
         return itemOfertaService.listarPaginaPorVendedor(pageable, vendedorId);
     }
 }
