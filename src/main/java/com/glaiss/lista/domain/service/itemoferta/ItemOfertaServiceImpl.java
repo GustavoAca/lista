@@ -109,15 +109,21 @@ public class ItemOfertaServiceImpl extends BaseServiceImpl<ItemOferta, UUID, Ite
     }
 
     @Override
-    public ResponsePage<ItemOfertaDTO> listarPaginaPorItem(Pageable pageable, UUID itemId){
+    public ResponsePage<ItemOfertaDTO> listarPaginaPorItem(Pageable pageable, UUID itemId) {
         Page<ItemOferta> itemPage = repo.findByItemId(itemId, pageable);
         var listaItem = itemPage.getContent().stream().map(itemOfertaMapper::toDto).toList();
         return new ResponsePage<>(listaItem, pageable.getPageNumber(), pageable.getPageSize(), itemPage.getTotalElements());
     }
 
     @Override
-    public ResponsePage<ItemOfertaProjection> listarPaginaPorVendedor(Pageable pageable, UUID vendedorId){
+    public ResponsePage<ItemOfertaProjection> listarPaginaPorVendedor(Pageable pageable, UUID vendedorId) {
         Page<ItemOfertaProjection> itemPage = repo.findAllByVendedorId(vendedorId, pageable);
+        return new ResponsePage<>(itemPage);
+    }
+
+    @Override
+    public ResponsePage<ItemOfertaProjection> listarPaginaPorItemNomeEVendedor(Pageable pageable, String itemNome, UUID vendedorId){
+        Page<ItemOfertaProjection> itemPage = repo.buscarPorItemNomeAndVendedor(itemNome, vendedorId, pageable);
         return new ResponsePage<>(itemPage);
     }
 }

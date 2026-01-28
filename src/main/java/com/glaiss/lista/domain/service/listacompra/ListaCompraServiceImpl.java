@@ -22,6 +22,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDateTime;
 import java.util.*;
 
 @Service
@@ -54,9 +55,9 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
         listaCompra.setId(null);
         listaCompra.setUsuarioId(SecurityContextUtils.getId());
         listaCompra.setValorTotal(calcularTotal(listaCompraRequest));
-        
+
         List<ItemLista> itemListas = listaCompra.getItensLista();
-        
+
         // Agrupamento de itens duplicados para evitar violação de constraint
         Map<UUID, ItemLista> itensAgrupados = new HashMap<>();
         if (itemListas != null) {
@@ -86,12 +87,8 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
             }
             itemLista.setItemOferta(itemOferta);
             itemLista.setListaCompra(finalListaCompra);
-            
-            if (itemOferta.getPreco() != null) {
-                itemLista.setPrecoUnitario(itemOferta.getPreco().setScale(2, RoundingMode.HALF_UP));
-            } else {
-                itemLista.setPrecoUnitario(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
-            }
+
+            itemLista.setPrecoUnitario(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
         });
 
         itemListaService.salvarAll(itemListasFinal);
@@ -163,7 +160,7 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
     @Override
     public Boolean deletar(UUID id) {
         ListaCompra listaCompra = repo.findById(id).orElseThrow(() -> new RegistroNaoEncontradoException(id, "Lista de compra"));
-        if (listaCompra.getUsuarioId().equals(SecurityContextUtils.getId())) {
+        if (!listaCompra.getUsuarioId().equals(SecurityContextUtils.getId())) {
             return false;
         }
         return super.deletar(listaCompra.getId());
@@ -179,13 +176,15 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
     }
 
     @Override
-    public void concluirLista(@Valid ConcluirListaRequestDTO concluirListaRequestDTO){
+    public void concluirLista(@Valid ConcluirListaRequestDTO concluirListaRequestDTO) {
         List<PrecoReportadoPendenteDTO> precoReportadoPendenteDTOs = new LinkedList<>();
         ListaCompra listaCompras = listaCompraMapper.toConcluirListaCompraToEntity(concluirListaRequestDTO);
 
         listaCompras.getItensLista().forEach(itemLista -> {
             itemLista.setListaCompra(em.getReference(ListaCompra.class, itemLista.getListaCompraId()));
-            precoReportadoPendenteDTOs.add(new PrecoReportadoPendenteDTO(null, itemLista.getItemOfertaId(), EStatusPrecoReportado.AGUARDANDO, itemLista.getItemOferta().getPreco(), null, (short) 0, Boolean.FALSE, null, null));
+            LocalDateTime dataInicioPromocao = itemLista.hasPromocao() ? LocalDateTime.now() : null;
+            LocalDateTime dataFinalPromocao = itemLista.hasPromocao() ? LocalDateTime.now().plusDays(1) : null;
+            precoReportadoPendenteDTOs.add(new PrecoReportadoPendenteDTO(null, itemLista.getItemOfertaId(), EStatusPrecoReportado.AGUARDANDO, itemLista.getItemOferta().getPreco(), null, (short) 0, itemLista.hasPromocao(), dataInicioPromocao, dataFinalPromocao));
         });
 
         itemListaService.salvarAllConcluindoLista(listaCompras.getItensLista());
@@ -216,5 +215,18 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
         listaCompra.setStatusLista(em.getReference(StatusLista.class, EStatusLista.FINALIZADA));
 
         repo.save(listaCompra);
+    }
+
+    @Override
+    public ListaCompraRequest atualizar(ListaCompraEdicaoRequest listaCompraEdicaoRequest) {
+        ListaCompra listaCompra = repo.findById(listaCompraEdicaoRequest.id())
+                .orElseThrow(() -> new RegistroNaoEncontradoException(listaCompraEdicaoRequest.id(), "Lista"));
+
+        listaCompra.setNome(listaCompraEdicaoRequest.nome());
+        if(listaCompra.getVersion().equals(listaCompraEdicaoRequest.version())){
+            listaCompra = repo.save(listaCompra);
+        }
+
+        return listaCompraMapper.toDto(listaCompra);
     }
 }
