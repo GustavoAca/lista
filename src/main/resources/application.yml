@@ -12,6 +12,7 @@ spring:
     enabled: true
     properties:
       hibernate:
+        default_schema: gl_lista
         jdbc:
           time_zone: America/Sao_Paulo
   security:
@@ -23,6 +24,7 @@ spring:
     # Defaults for local/dev
     user: gl_lista
     password: gl_lista
+    url: jdbc:postgresql://localhost:5432/glaiss?currentSchema=gl_lista&TimeZone=America/Sao_Paulo
 
   # ==============================================================
   # FEATURE FLAGS & INTEGRATIONS (Default: Standalone/Disabled)
@@ -134,8 +136,8 @@ spring:
     activate:
       on-profile: dev
   datasource:
-    url: jdbc:postgresql://localhost:5432/glaiss?TimeZone=America/Sao_Paulo
-    username: gl_lista
+    url: jdbc:postgresql://localhost:5432/glaiss?currentSchema=gl_lista&TimeZone=America/Sao_Paulo
+    username: gl_lista_app
     password: gl_lista
     driver-class-name: org.postgresql.Driver
 
@@ -153,5 +155,10 @@ spring:
     password: ${PASSWORD_DB}
     driver-class-name: org.postgresql.Driver
   flyway:
-    user: ${USER_DB}
-    password: ${PASSWORD_DB}
+    user: ${USER_DB_FLYWAY}
+    password: ${PASSWORD_DB_FLYWAY}
+    url: ${DB_URL}
+
+jwt:
+  public:
+    key: ${PUBLIC_KEY}

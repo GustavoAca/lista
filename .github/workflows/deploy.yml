@@ -5,7 +5,7 @@ on:
     branches: [ "main" ]
 
 jobs:
-  call-reusable-deploy:
+  deploy:
     uses: GustavoAca/core/.github/workflows/reusable-service-deploy.yml@main
     with:
       image_name: lista
