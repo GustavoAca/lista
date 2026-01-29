@@ -6,7 +6,6 @@ import com.glaiss.lista.controller.itemoferta.dto.ItemOfertaDTO;
 import com.glaiss.lista.domain.model.dto.projection.vendedor.ItemOfertaProjection;
 import com.glaiss.lista.domain.service.itemoferta.ItemOfertaService;
 import jakarta.validation.Valid;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpStatus;
@@ -25,27 +24,32 @@ public class ItemOfertaController {
     }
 
     @GetMapping
-    @Cacheable(value = "ItemOferta", key = "#pageable.pageNumber")
-    public ResponsePage<ItemOfertaDTO> listar(@PageableDefault(size = 20) Pageable pageable){
+    public ResponsePage<ItemOfertaDTO> listar(@PageableDefault(size = 20) Pageable pageable) {
         return itemOfertaService.listarPaginaDTO(pageable);
     }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public ItemOfertaDTO criar(@Valid @RequestBody ItemOfertaDTO itemOfertaDTO){
+    public ItemOfertaDTO criar(@Valid @RequestBody ItemOfertaDTO itemOfertaDTO) {
         return itemOfertaService.salvar(itemOfertaDTO);
     }
 
     @GetMapping("/{itemId}")
-    @Cacheable(value = "ItemOferta", key = "#itemId + ':' + #pageable.pageNumber")
     public ResponsePage<ItemOfertaDTO> listarPorItem(@PageableDefault(size = 20) Pageable pageable,
-                                                     @PathVariable UUID itemId){
+                                                     @PathVariable UUID itemId) {
         return itemOfertaService.listarPaginaPorItem(pageable, itemId);
+    }
+
+    @GetMapping("/buscar-por-vendedor-e-nome-item")
+    public ResponsePage<ItemOfertaProjection> listarPorItemNome(@PageableDefault(size = 20) Pageable pageable,
+                                                                @RequestParam String itemNome,
+                                                                @RequestParam UUID vendedorId) {
+        return itemOfertaService.listarPaginaPorItemNomeEVendedor(pageable, itemNome, vendedorId);
     }
 
     @GetMapping("/vendedor/{vendedorId}")
     public ResponsePage<ItemOfertaProjection> listarPorVendedorId(@PageableDefault(size = 20) Pageable pageable,
-                                                                  @PathVariable UUID vendedorId){
+                                                                  @PathVariable UUID vendedorId) {
         return itemOfertaService.listarPaginaPorVendedor(pageable, vendedorId);
     }
 }

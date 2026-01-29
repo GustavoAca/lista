@@ -26,8 +26,8 @@ public class ItemLista extends EntityAbstract {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
-    @Column(name = "preco_unitario", nullable = true)
-    @ValorBigDecimal
+    @Column(name = "preco_unitario")
+    @ValorBigDecimal(nullable = true)
     private BigDecimal precoUnitario;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -60,5 +60,9 @@ public class ItemLista extends EntityAbstract {
 
     public void adicionarQuantidade(short quantidade){
         this.quantidade += quantidade;
+    }
+
+    public Boolean hasPromocao(){
+        return this.itemOferta.getHasPromocaoAtiva();
     }
 }

@@ -29,4 +29,6 @@ public interface ItemOfertaService extends BaseService<ItemOferta, UUID> {
     ResponsePage<ItemOfertaDTO> listarPaginaPorItem(Pageable pageable, UUID itemId);
 
     ResponsePage<ItemOfertaProjection> listarPaginaPorVendedor(Pageable pageable, UUID vendedorId);
+
+    ResponsePage<ItemOfertaProjection> listarPaginaPorItemNomeEVendedor(Pageable pageable, String itemNome, UUID vendedorId);
 }

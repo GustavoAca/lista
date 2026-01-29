@@ -33,6 +33,8 @@ public class ListaCompraMapper {
                 .itensLista(toItemListaEntity(listaCompraRequest.itensLista()))
                 .version(listaCompraRequest.version())
                 .statusLista(StatusLista.builder().codigo(listaCompraRequest.statusLista()).build())
+                .createdDate(listaCompraRequest.createdDate())
+                .modifiedDate(listaCompraRequest.modifiedDate())
                 .build();
     }
 
@@ -51,7 +53,9 @@ public class ListaCompraMapper {
                 entity.getTotalItens(),
                 (toItemListaDto(entity.getItensLista())),
                 entity.getVersion(),
-                entity.getStatusLista().getCodigo());
+                entity.getStatusLista().getCodigo(),
+                entity.getModifiedDate(),
+                entity.getCreatedDate());
     }
 
     private List<ItemListaRequest> toItemListaDto(List<ItemLista> itemListas) {

@@ -61,4 +61,14 @@ public class ListaCompraController {
     public void concluirLista(@Valid @RequestBody ConcluirListaRequestDTO concluirListaRequestDTO) {
         listaCompraService.concluirLista(concluirListaRequestDTO);
     }
+
+    @DeleteMapping("/{id}")
+    public void excluir(@PathVariable UUID id){
+        listaCompraService.deletar(id);
+    }
+
+    @PutMapping
+    public ListaCompraRequest atualizar(@RequestBody ListaCompraEdicaoRequest listaCompraEdicaoRequest){
+       return listaCompraService.atualizar(listaCompraEdicaoRequest);
+    }
 }

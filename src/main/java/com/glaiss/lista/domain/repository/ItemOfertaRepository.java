@@ -30,4 +30,16 @@ public interface ItemOfertaRepository extends BaseRepository<ItemOferta, UUID> {
             """)
     Page<ItemOfertaProjection> findAllByVendedorId(@Param("vendedorId") UUID vendedorId,
                                                    Pageable pageable);
+
+    @Query("""
+            select io
+            from ItemOferta io
+            join io.item i
+            where vendedor.id = :vendedorId and lower(i.nome) like lower(concat('%', :itemNome, '%'))
+          """)
+    Page<ItemOfertaProjection> buscarPorItemNomeAndVendedor(
+            @Param("itemNome") String itemNome,
+            @Param("vendedor") UUID vendedorId,
+            Pageable pageable
+    );
 }
