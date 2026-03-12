@@ -22,6 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Service
@@ -48,31 +49,36 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
     @Override
     @Transactional
     public List<ItemListaRequest> adicionaLista(UUID listaId, List<ItemAdicionadoRequest> itensDto) {
-        List<ItemLista> itemListas = new LinkedList<>();
-        
         ListaCompra listaCompraRef = em.getReference(ListaCompra.class, listaId);
+        
+        List<UUID> itemOfertaIds = itensDto.stream().map(ItemAdicionadoRequest::itemOfertaId).toList();
+        List<ItemLista> itensExistentes = repo.findAllByListaCompra_IdAndItemOferta_IdIn(listaId, itemOfertaIds);
+        
+        Map<UUID, ItemLista> mapaItensExistentes = itensExistentes.stream()
+                .collect(java.util.stream.Collectors.toMap(ItemLista::getItemOfertaId, item -> item));
+
+        List<ItemLista> itensParaSalvar = new LinkedList<>();
 
         for (ItemAdicionadoRequest itemAdicionadoRequest : itensDto) {
-            ItemLista itemLista = repo.findByListaCompra_IdAndItemOferta_Id(listaId, itemAdicionadoRequest.itemOfertaId())
-                    .map(existente -> {
-                        existente.adicionarQuantidade(itemAdicionadoRequest.quantidade());
-                        return existente;
-                    })
-                    .orElseGet(() -> {
-                        ItemOferta itemOfertaRef = em.getReference(ItemOferta.class, itemAdicionadoRequest.itemOfertaId());
-                        return ItemLista.builder()
-                                .listaCompra(listaCompraRef)
-                                .itemOferta(itemOfertaRef)
-                                .quantidade(itemAdicionadoRequest.quantidade())
-                                .build();
-                    });
-            itemListas.add(itemLista);
+            ItemLista itemLista = mapaItensExistentes.get(itemAdicionadoRequest.itemOfertaId());
+            if (itemLista != null) {
+                itemLista.adicionarQuantidade(itemAdicionadoRequest.quantidade());
+            } else {
+                ItemOferta itemOfertaRef = em.getReference(ItemOferta.class, itemAdicionadoRequest.itemOfertaId());
+                itemLista = ItemLista.builder()
+                        .listaCompra(listaCompraRef)
+                        .itemOferta(itemOfertaRef)
+                        .quantidade(itemAdicionadoRequest.quantidade())
+                        .build();
+            }
+            itensParaSalvar.add(itemLista);
         }
+        
         try {
-            return repo.saveAll(itemListas).stream()
+            return repo.saveAll(itensParaSalvar).stream()
                     .map(itemListaMapper::toDto)
                     .toList();
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("Erro ao salvar itens na lista {}", listaId, e);
             throw new AdicionarItemListaException();
         }
@@ -89,27 +95,45 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
     }
 
     @Override
-    public Boolean alterarItens(UUID listaId, List<ItemAlteradoRequest> itensAlterados) {
+    @Transactional
+    public Boolean alterarItens(UUID listaId, List<ItemAlteradoRequest> itensAlteradosDto) {
         try {
-            List<ItemLista> itensLista = new LinkedList<>();
-            for (ItemAlteradoRequest itemAlterado : itensAlterados) {
-                ItemLista itemLista = repo
-                        .findById(itemAlterado.id())
-                        .map(existente -> {
-                            existente.alterarQuantidade(itemAlterado.quantidade());
-                            return existente;
-                        })
-                        .orElseThrow(() -> new RegistroNaoEncontradoException("Item Lista"));
-                if(itemLista.getQuantidade() == 0){
-                    repo.delete(itemLista);
-                    continue;
-                }
-                itensLista.add(itemLista);
+            List<UUID> itensIds = itensAlteradosDto.stream().map(ItemAlteradoRequest::id).toList();
+            List<ItemLista> itensExistentes = repo.findAllByIdInAndListaCompra_Id(itensIds, listaId);
+
+            if (itensExistentes.size() != itensAlteradosDto.size()) {
+                 log.warn("Alguns itens não foram encontrados na lista {} para alteração", listaId);
+                 // Opcional: throw exception ou continuar com os encontrados
             }
 
-            repo.saveAll(itensLista);
+            Map<UUID, ItemLista> mapaItens = itensExistentes.stream()
+                    .collect(java.util.stream.Collectors.toMap(ItemLista::getId, item -> item));
+
+            List<ItemLista> paraSalvar = new LinkedList<>();
+            List<ItemLista> paraDeletar = new LinkedList<>();
+
+            for (ItemAlteradoRequest itemAlterado : itensAlteradosDto) {
+                ItemLista itemLista = mapaItens.get(itemAlterado.id());
+                if (itemLista != null) {
+                    itemLista.alterarQuantidade(itemAlterado.quantidade());
+                    if (itemLista.getQuantidade() <= 0) {
+                        paraDeletar.add(itemLista);
+                    } else {
+                        paraSalvar.add(itemLista);
+                    }
+                }
+            }
+
+            if (!paraDeletar.isEmpty()) {
+                repo.deleteAll(paraDeletar);
+            }
+            if (!paraSalvar.isEmpty()) {
+                repo.saveAll(paraSalvar);
+            }
+
             return Boolean.TRUE;
         } catch (Exception e) {
+            log.error("Erro ao alterar itens na lista {}", listaId, e);
             return Boolean.FALSE;
         }
     }
@@ -120,5 +144,24 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
             itemLista.setPrecoUnitario(itemLista.getItemOferta().getPreco());
             repo.save(itemLista);
         });
+    }
+
+    @Override
+    @Transactional
+    public Boolean removerItem(UUID listaId, UUID itemId) {
+        try {
+            ItemLista item = repo.findById(itemId)
+                    .orElseThrow(() -> new RegistroNaoEncontradoException("Item Lista"));
+            
+            if (!item.getListaCompra().getId().equals(listaId)) {
+                return Boolean.FALSE;
+            }
+
+            repo.delete(item);
+            return Boolean.TRUE;
+        } catch (Exception e) {
+            log.error("Erro ao remover item {} da lista {}", itemId, listaId, e);
+            return Boolean.FALSE;
+        }
     }
 }

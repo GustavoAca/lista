@@ -62,6 +62,11 @@ public class ListaCompraController {
         listaCompraService.concluirLista(concluirListaRequestDTO);
     }
 
+    @DeleteMapping("/{listaId}/itens/{itemId}")
+    public Boolean removerItem(@PathVariable UUID listaId, @PathVariable UUID itemId) {
+        return listaCompraService.removerItem(listaId, itemId);
+    }
+
     @DeleteMapping("/{id}")
     public void excluir(@PathVariable UUID id){
         listaCompraService.deletar(id);

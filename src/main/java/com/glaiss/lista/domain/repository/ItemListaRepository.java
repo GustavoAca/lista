@@ -39,4 +39,8 @@ public interface ItemListaRepository extends BaseRepository<ItemLista, UUID> {
     );
 
     Optional<ItemLista> findByListaCompra_IdAndItemOferta_Id(UUID listaId, UUID uuid);
+
+    List<ItemLista> findAllByListaCompra_IdAndItemOferta_IdIn(UUID listaId, List<UUID> itemOfertaIds);
+
+    List<ItemLista> findAllByIdInAndListaCompra_Id(List<UUID> ids, UUID listaId);
 }

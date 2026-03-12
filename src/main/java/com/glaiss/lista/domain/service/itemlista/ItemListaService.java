@@ -25,4 +25,6 @@ public interface ItemListaService extends BaseService<ItemLista, UUID> {
     Boolean alterarItens(UUID listaId, List<ItemAlteradoRequest> itensLista);
 
     void salvarAllConcluindoLista(List<ItemLista> itensLista);
+
+    Boolean removerItem(UUID listaId, UUID itemId);
 }

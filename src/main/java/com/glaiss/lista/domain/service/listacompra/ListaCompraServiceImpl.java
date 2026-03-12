@@ -54,43 +54,42 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
         ListaCompra listaCompra = listaCompraMapper.toEntity(listaCompraRequest);
         listaCompra.setId(null);
         listaCompra.setUsuarioId(SecurityContextUtils.getId());
-        listaCompra.setValorTotal(calcularTotal(listaCompraRequest));
 
         List<ItemLista> itemListas = listaCompra.getItensLista();
 
         // Agrupamento de itens duplicados para evitar violação de constraint
-        Map<UUID, ItemLista> itensAgrupados = new HashMap<>();
+        List<ItemLista> itemListasFinal = new ArrayList<>();
         if (itemListas != null) {
-            for (ItemLista item : itemListas) {
-                UUID itemOfertaId = item.getItemOfertaId();
-                if (itensAgrupados.containsKey(itemOfertaId)) {
-                    ItemLista itemExistente = itensAgrupados.get(itemOfertaId);
-                    itemExistente.setQuantidade((short) (itemExistente.getQuantidade() + item.getQuantidade()));
-                } else {
-                    itensAgrupados.put(itemOfertaId, item);
+            Map<UUID, Short> itensAgrupados = itemListas.stream()
+                .collect(java.util.stream.Collectors.groupingBy(
+                    ItemLista::getItemOfertaId,
+                    java.util.stream.Collectors.summingInt(ItemLista::getQuantidade)
+                )).entrySet().stream()
+                .collect(java.util.stream.Collectors.toMap(
+                    Map.Entry::getKey,
+                    e -> e.getValue().shortValue()
+                ));
+
+            itensAgrupados.forEach((itemOfertaId, quantidade) -> {
+                ItemOferta itemOferta = em.find(ItemOferta.class, itemOfertaId);
+                if (itemOferta == null) {
+                    throw new RegistroNaoEncontradoException(itemOfertaId, "Item Oferta");
                 }
-            }
+                itemListasFinal.add(ItemLista.builder()
+                    .itemOferta(itemOferta)
+                    .quantidade(quantidade)
+                    .listaCompra(null) // Será setado abaixo
+                    .precoUnitario(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP))
+                    .build());
+            });
         }
-        List<ItemLista> itemListasFinal = new ArrayList<>(itensAgrupados.values());
 
-        listaCompra.setItensLista(null);
-        listaCompra.setTotalItens((short) itemListasFinal.size());
+        listaCompra.setItensLista(itemListasFinal);
         listaCompra.setStatusLista(em.getReference(StatusLista.class, EStatusLista.AGUARDANDO));
-        listaCompra = repo.save(listaCompra);
-
-        ListaCompra finalListaCompra = listaCompra;
-
-        itemListasFinal.forEach(itemLista -> {
-            ItemOferta itemOferta = em.find(ItemOferta.class, itemLista.getItemOfertaId());
-            if (itemOferta == null) {
-                throw new RegistroNaoEncontradoException(itemLista.getItemOfertaId(), "Item Oferta");
-            }
-            itemLista.setItemOferta(itemOferta);
-            itemLista.setListaCompra(finalListaCompra);
-
-            itemLista.setPrecoUnitario(BigDecimal.ZERO.setScale(2, RoundingMode.HALF_UP));
-        });
-
+        listaCompra.recalcularTotais();
+        
+        ListaCompra finalListaCompra = repo.save(listaCompra);
+        itemListasFinal.forEach(item -> item.setListaCompra(finalListaCompra));
         itemListaService.salvarAll(itemListasFinal);
     }
 
@@ -115,9 +114,16 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
     }
 
     @Override
+    @Transactional
     public List<ItemListaRequest> adicionarItemLista(UUID listaId, List<ItemAdicionadoRequest> itemDTO) {
         List<ItemListaRequest> itens = itemListaService.adicionaLista(listaId, itemDTO);
-        atualizarTotaisLista(listaId);
+        
+        ListaCompra listaCompra = repo.findById(listaId)
+                .orElseThrow(() -> new RegistroNaoEncontradoException(listaId, "Lista de compra"));
+        
+        listaCompra.recalcularTotais();
+        repo.save(listaCompra);
+        
         return itens;
     }
 
@@ -133,30 +139,6 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
         return listaCompraMapper.toDto(repo.findById(listaId).orElseThrow(() -> new RegistroNaoEncontradoException(listaId, "Lista de compra")));
     }
 
-    private void atualizarTotaisLista(UUID listaId) {
-        ListaCompra listaCompra = repo.findById(listaId)
-                .orElseThrow(() ->
-                        new RegistroNaoEncontradoException(listaId, "Lista de compra"));
-
-        BigDecimal novoValorTotal = BigDecimal.ZERO;
-        int novoTotalItens = 0;
-
-        for (ItemLista item : listaCompra.getItensLista()) {
-            BigDecimal precoItem = item.getItemOferta().getPreco();
-            BigDecimal subtotal = precoItem.multiply(
-                    BigDecimal.valueOf(item.getQuantidade())
-            );
-
-            novoValorTotal = novoValorTotal.add(subtotal);
-            novoTotalItens++;
-        }
-
-        listaCompra.setValorTotal(novoValorTotal);
-        listaCompra.setTotalItens((short) novoTotalItens);
-
-        repo.save(listaCompra);
-    }
-
     @Override
     public Boolean deletar(UUID id) {
         ListaCompra listaCompra = repo.findById(id).orElseThrow(() -> new RegistroNaoEncontradoException(id, "Lista de compra"));
@@ -167,53 +149,36 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
     }
 
     @Override
+    @Transactional
     public Boolean alterarItens(UUID listaId, List<ItemAlteradoRequest> itensLista) {
-        Boolean removido = itemListaService.alterarItens(listaId, itensLista);
-        if (removido) {
-            atualizarTotaisLista(listaId);
+        Boolean alterado = itemListaService.alterarItens(listaId, itensLista);
+        if (alterado) {
+            ListaCompra listaCompra = repo.findById(listaId)
+                .orElseThrow(() -> new RegistroNaoEncontradoException(listaId, "Lista de compra"));
+            listaCompra.recalcularTotais();
+            repo.save(listaCompra);
         }
-        return removido;
+        return alterado;
     }
 
     @Override
+    @Transactional
     public void concluirLista(@Valid ConcluirListaRequestDTO concluirListaRequestDTO) {
         List<PrecoReportadoPendenteDTO> precoReportadoPendenteDTOs = new LinkedList<>();
-        ListaCompra listaCompras = listaCompraMapper.toConcluirListaCompraToEntity(concluirListaRequestDTO);
+        ListaCompra listaCompra = repo.findById(concluirListaRequestDTO.id())
+                .orElseThrow(() -> new RegistroNaoEncontradoException(concluirListaRequestDTO.id(), "Lista de compra"));
 
-        listaCompras.getItensLista().forEach(itemLista -> {
-            itemLista.setListaCompra(em.getReference(ListaCompra.class, itemLista.getListaCompraId()));
+        listaCompra.getItensLista().forEach(itemLista -> {
             LocalDateTime dataInicioPromocao = itemLista.hasPromocao() ? LocalDateTime.now() : null;
             LocalDateTime dataFinalPromocao = itemLista.hasPromocao() ? LocalDateTime.now().plusDays(1) : null;
             precoReportadoPendenteDTOs.add(new PrecoReportadoPendenteDTO(null, itemLista.getItemOfertaId(), EStatusPrecoReportado.AGUARDANDO, itemLista.getItemOferta().getPreco(), null, (short) 0, itemLista.hasPromocao(), dataInicioPromocao, dataFinalPromocao));
         });
 
-        itemListaService.salvarAllConcluindoLista(listaCompras.getItensLista());
+        itemListaService.salvarAllConcluindoLista(listaCompra.getItensLista());
         precoReportadoPendenteService.salvarAll(precoReportadoPendenteDTOs);
-        atualizarTotaisListaConcluida(concluirListaRequestDTO.id());
-    }
-
-    private void atualizarTotaisListaConcluida(UUID listaId) {
-        ListaCompra listaCompra = repo.findById(listaId)
-                .orElseThrow(() ->
-                        new RegistroNaoEncontradoException(listaId, "Lista de compra"));
-
-        BigDecimal novoValorTotal = BigDecimal.ZERO;
-        int novoTotalItens = 0;
-
-        for (ItemLista item : listaCompra.getItensLista()) {
-            BigDecimal precoItem = item.getPrecoUnitario();
-            BigDecimal subtotal = precoItem.multiply(
-                    BigDecimal.valueOf(item.getQuantidade())
-            );
-
-            novoValorTotal = novoValorTotal.add(subtotal);
-            novoTotalItens++;
-        }
-
-        listaCompra.setValorTotal(novoValorTotal);
-        listaCompra.setTotalItens((short) novoTotalItens);
+        
         listaCompra.setStatusLista(em.getReference(StatusLista.class, EStatusLista.FINALIZADA));
-
+        listaCompra.recalcularTotais();
         repo.save(listaCompra);
     }
 
@@ -228,5 +193,18 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
         }
 
         return listaCompraMapper.toDto(listaCompra);
+    }
+
+    @Override
+    @Transactional
+    public Boolean removerItem(UUID listaId, UUID itemId) {
+        Boolean removido = itemListaService.removerItem(listaId, itemId);
+        if (removido) {
+            ListaCompra listaCompra = repo.findById(listaId)
+                .orElseThrow(() -> new RegistroNaoEncontradoException(listaId, "Lista de compra"));
+            listaCompra.recalcularTotais();
+            repo.save(listaCompra);
+        }
+        return removido;
     }
 }

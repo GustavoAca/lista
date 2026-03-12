@@ -33,8 +33,8 @@ public class EnderecoServiceImplTest extends ListaApplicationTests {
     @Test
     void salvar_deveRetornarDto_quandoSalvarComSucesso() {
         EnderecoDTO inputDto = new EnderecoDTO("complemento","0999999","rua","bairro","cidade","1", "SP", null, null, 0);
-        Endereco entity = new Endereco();
-        Endereco savedEntity = new Endereco();
+        Endereco entity = Endereco.builder().build();
+        Endereco savedEntity = Endereco.builder().build();
         EnderecoDTO expectedDto = new EnderecoDTO("complemento","0999999","rua","bairro","cidade","1", "SP", null, null, 0);
 
         when(enderecoMapper.toEntity(inputDto)).thenReturn(entity);
@@ -63,7 +63,7 @@ public class EnderecoServiceImplTest extends ListaApplicationTests {
     @Test
     void salvar_devePropagarExcecao_quandoRepositorioFalhar() {
         EnderecoDTO inputDto = new EnderecoDTO("complemento","0999999","rua","bairro","cidade","1", "SP", null, null, 0);
-        Endereco entity = new Endereco();
+        Endereco entity = Endereco.builder().build();
 
         when(enderecoMapper.toEntity(inputDto)).thenReturn(entity);
         when(repo.save(entity)).thenThrow(new RuntimeException("db error"));

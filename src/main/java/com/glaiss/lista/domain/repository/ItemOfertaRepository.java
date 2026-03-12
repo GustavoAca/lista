@@ -3,10 +3,10 @@ package com.glaiss.lista.domain.repository;
 import com.glaiss.core.domain.repository.BaseRepository;
 import com.glaiss.lista.domain.model.ItemOferta;
 import com.glaiss.lista.domain.model.dto.projection.vendedor.ItemOfertaProjection;
-import feign.Param;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.UUID;
