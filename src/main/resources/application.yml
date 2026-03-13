@@ -6,6 +6,7 @@ server:
 spring:
   application:
     name: lista
+    version: @project.version@
   profiles:
     active: dev
 
@@ -33,6 +34,7 @@ spring:
     schemas: gl_lista
     user: ${USER_DB_FLYWAY:gl_lista}
     password: ${PASSWORD_DB_FLYWAY:gl_lista}
+    baseline-on-migrate: true
 
   # Configurações de Serialização (Suportado pelo core-common)
   jackson:
@@ -55,10 +57,24 @@ spring:
   cache:
     type: ${CACHE_TYPE:simple}
 
-# Configurações de Segurança (Suportado pelo core-security)
-security:
-  jwt:
-    public-key: ${JWT_PUBLIC_KEY}
+jwt:
+  public:
+    key: |
+      -----BEGIN PUBLIC KEY-----
+      MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAxyxs9a0bpYdH9x2hfjNS
+      yNnz4FXmSpPz9CRLbtVlvghnZ4G9HB3Z++Z2HfpLIPahoCyp+Bi8b9gmDue3qRAn
+      cSNH16LCcNrOYFapz9MoW3U6ijOKZJsowdWDnHY8e3FjSBTw5s4X9c2wha2v9Erj
+      QNYdIIDXmqWoWm2206MsDzbwQ4bQo69/zMYU0xUmI0ZQViYVa6DVvXXZrYyyLNOv
+      JrSxF+Fs3fN3Mv6/rELmwrR9KJNL+NaKuQW7BDV8L0f5m6davtQwzSmwkR+BlT97
+      4wPPPdnZN+CzRW+7wAHTsMw1D8nEtL2bkHh1X82p+2nyMl+qQ/FtTaYEvbnazPGs
+      ewIDAQAB
+      -----END PUBLIC KEY-----
+
+# Configurações Específicas da Aplicação
+servico-externos-permitidos: ${ALLOWED_ORIGINS:http://localhost:4200,http://localhost:4201}
+eureka:
+  client:
+    enabled: false
 
 # Observabilidade e Actuator (JSON para CloudWatch já configurado no logback)
 management:

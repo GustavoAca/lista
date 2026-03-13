@@ -128,6 +128,7 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
     }
 
     @Override
+    @Transactional
     public ResponsePage<ListaCompraRequest> listar(Pageable pageable) {
         Page<ListaCompra> listaCompra = repo.findAllByUsuarioId(pageable, SecurityContextUtils.getId());
         List<ListaCompraRequest> listaCompraRequest = listaCompra.getContent().stream().map(listaCompraMapper::toDto).toList();
@@ -135,6 +136,7 @@ public class ListaCompraServiceImpl extends BaseServiceImpl<ListaCompra, UUID, L
     }
 
     @Override
+    @Transactional
     public ListaCompraRequest buscarPorIdDto(UUID listaId) {
         return listaCompraMapper.toDto(repo.findById(listaId).orElseThrow(() -> new RegistroNaoEncontradoException(listaId, "Lista de compra")));
     }

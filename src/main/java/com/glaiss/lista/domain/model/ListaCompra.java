@@ -31,7 +31,7 @@ public class ListaCompra extends EntityAbstract {
     @Column(name = "total_itens")
     private short totalItens;
 
-    @OneToMany(mappedBy = "listaCompra", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "listaCompra", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<ItemLista> itensLista = new LinkedList<>();
 
     @ManyToOne(fetch = FetchType.EAGER)
