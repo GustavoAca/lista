@@ -125,7 +125,8 @@ public class ListaCompra extends EntityAbstract {
                                      (item.getItemOferta() != null ? item.getItemOferta().getPreco() : BigDecimal.ZERO);
                     return (preco != null ? preco : BigDecimal.ZERO).multiply(BigDecimal.valueOf(item.getQuantidade()));
                 })
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
+                .reduce(BigDecimal.ZERO, BigDecimal::add)
+                .setScale(2, java.math.RoundingMode.HALF_UP);
     }
 
     public StatusLista getStatusLista() {

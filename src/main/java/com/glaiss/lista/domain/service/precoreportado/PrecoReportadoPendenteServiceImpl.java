@@ -43,7 +43,7 @@ public class PrecoReportadoPendenteServiceImpl extends BaseServiceImpl<PrecoRepo
     public void atualizarTentativas(PrecoReportadoPendenteDTO precoReportadoPendenteDTO) {
         PrecoReportadoPendente precoReportadoPendente = repo.findById(precoReportadoPendenteDTO.id())
                 .orElseThrow(() -> new RegistroNaoEncontradoException(precoReportadoPendenteDTO.id(), "Preco reportado pendente"));
-        precoReportadoPendente.setTentatives((short) (precoReportadoPendente.getTentativas() + 1));
+        precoReportadoPendente.setTentativas((short) (precoReportadoPendente.getTentativas() + 1));
         precoReportadoPendente.setMensagemErro(precoReportadoPendenteDTO.mensagemErro());
         repo.save(precoReportadoPendente);
     }

@@ -32,6 +32,7 @@ public class VendedorServiceImpl extends BaseServiceImpl<Vendedor, UUID, Vendedo
         this.enderecoService = enderecoService;
     }
 
+    @Transactional
     public ResponsePage<VendedorDTO> listarPaginaDTO(Pageable pageable) {
         Page<Vendedor> vendedorPage = repo.findAll(pageable);
         var listaDeVendedores = vendedorPage.getContent().stream().map(vendedorMapper::toDto).toList();

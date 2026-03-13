@@ -141,7 +141,9 @@ public class ItemListaServiceImpl extends BaseServiceImpl<ItemLista, UUID, ItemL
     @Override
     public void salvarAllConcluindoLista(List<ItemLista> itensLista) {
         itensLista.forEach(itemLista -> {
-            itemLista.setPrecoUnitario(itemLista.getItemOferta().getPreco());
+            if (itemLista.getItemOferta() != null) {
+                itemLista.setPrecoUnitario(itemLista.getItemOferta().getPreco());
+            }
             repo.save(itemLista);
         });
     }

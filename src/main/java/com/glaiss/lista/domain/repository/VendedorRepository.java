@@ -4,12 +4,23 @@ import com.glaiss.core.domain.repository.BaseRepository;
 import com.glaiss.lista.domain.model.Vendedor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface VendedorRepository extends BaseRepository<Vendedor, UUID> {
 
+    @Override
+    @EntityGraph(attributePaths = {"enderecos"})
+    Page<Vendedor> findAll(Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"enderecos"})
+    Optional<Vendedor> findById(UUID id);
+
+    @EntityGraph(attributePaths = {"enderecos"})
     Page<Vendedor> findByNomeContainingIgnoreCase(Pageable pageable, String nome);
 }

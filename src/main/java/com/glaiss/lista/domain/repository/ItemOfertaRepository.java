@@ -5,14 +5,26 @@ import com.glaiss.lista.domain.model.ItemOferta;
 import com.glaiss.lista.domain.model.dto.projection.vendedor.ItemOfertaProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
 public interface ItemOfertaRepository extends BaseRepository<ItemOferta, UUID> {
+
+    @Override
+    @EntityGraph(attributePaths = {"item", "vendedor"})
+    Page<ItemOferta> findAll(Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"item", "vendedor"})
+    Optional<ItemOferta> findById(UUID id);
+
+    @EntityGraph(attributePaths = {"item", "vendedor"})
     @Query("""
                SELECT io
                FROM ItemOferta io
@@ -39,7 +51,7 @@ public interface ItemOfertaRepository extends BaseRepository<ItemOferta, UUID> {
           """)
     Page<ItemOfertaProjection> buscarPorItemNomeAndVendedor(
             @Param("itemNome") String itemNome,
-            @Param("vendedor") UUID vendedorId,
+            @Param("vendedorId") UUID vendedorId,
             Pageable pageable
     );
 }

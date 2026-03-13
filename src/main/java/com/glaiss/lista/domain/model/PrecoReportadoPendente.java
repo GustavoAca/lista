@@ -26,7 +26,7 @@ public class PrecoReportadoPendente extends EntityAbstract {
     @JoinColumn(name = "status_preco_reportado", nullable = false)
     private StatusPrecoReportado statusPrecoReportado;
 
-    @ValorBigDecimal
+    @ValorBigDecimal(nullable = true)
     private BigDecimal preco;
 
     @Column(name = "mensagem_erro")
@@ -54,7 +54,7 @@ public class PrecoReportadoPendente extends EntityAbstract {
         this.statusPrecoReportado = builder.statusPrecoReportado;
         this.preco = builder.preco;
         this.mensagemErro = builder.mensagemErro;
-        this.tentativas = builder.tentatives;
+        this.tentativas = builder.tentativas;
         this.hasPromocaoAtiva = builder.hasPromocaoAtiva;
         this.dataInicioPromocao = builder.dataInicioPromocao;
         this.dataFinalPromocao = builder.dataFinalPromocao;
@@ -110,8 +110,8 @@ public class PrecoReportadoPendente extends EntityAbstract {
         return tentativas;
     }
 
-    public void setTentatives(Short tentatives) {
-        this.tentativas = tentatives;
+    public void setTentativas(Short tentativas) {
+        this.tentativas = tentativas;
     }
 
     public Boolean getHasPromocaoAtiva() {
@@ -170,7 +170,7 @@ public class PrecoReportadoPendente extends EntityAbstract {
         private StatusPrecoReportado statusPrecoReportado;
         private BigDecimal preco;
         private String mensagemErro;
-        private Short tentatives;
+        private Short tentativas;
         private Boolean hasPromocaoAtiva;
         private LocalDateTime dataInicioPromocao;
         private LocalDateTime dataFinalPromocao;
@@ -208,8 +208,8 @@ public class PrecoReportadoPendente extends EntityAbstract {
             return this;
         }
 
-        public PrecoReportadoPendenteBuilder tentativas(Short tentatives) {
-            this.tentatives = tentatives;
+        public PrecoReportadoPendenteBuilder tentativas(Short tentativas) {
+            this.tentativas = tentativas;
             return this;
         }
 

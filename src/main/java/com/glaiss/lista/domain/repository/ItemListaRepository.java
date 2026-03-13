@@ -5,6 +5,7 @@ import com.glaiss.lista.domain.model.ItemLista;
 import com.glaiss.lista.domain.model.dto.projection.listacompra.ItemListaProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,6 +17,14 @@ import java.util.UUID;
 
 @Repository
 public interface ItemListaRepository extends BaseRepository<ItemLista, UUID> {
+
+    @Override
+    @EntityGraph(attributePaths = {"itemOferta", "listaCompra"})
+    Page<ItemLista> findAll(Pageable pageable);
+
+    @Override
+    @EntityGraph(attributePaths = {"itemOferta", "listaCompra"})
+    Optional<ItemLista> findById(UUID id);
 
     @Query(value = "SELECT i FROM ItemLista i " +
             "JOIN FETCH i.itemOferta io " +
@@ -38,9 +47,12 @@ public interface ItemListaRepository extends BaseRepository<ItemLista, UUID> {
             @Param("itensIds") List<UUID> itensIds
     );
 
+    @EntityGraph(attributePaths = {"itemOferta", "listaCompra"})
     Optional<ItemLista> findByListaCompra_IdAndItemOferta_Id(UUID listaId, UUID uuid);
 
+    @EntityGraph(attributePaths = {"itemOferta", "listaCompra"})
     List<ItemLista> findAllByListaCompra_IdAndItemOferta_IdIn(UUID listaId, List<UUID> itemOfertaIds);
 
+    @EntityGraph(attributePaths = {"itemOferta", "listaCompra"})
     List<ItemLista> findAllByIdInAndListaCompra_Id(List<UUID> ids, UUID listaId);
 }
